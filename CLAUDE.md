@@ -16,6 +16,7 @@ Progress through the skill:
 - Phase 8 build: `site/index.html`, `site/assets/css/style.css`, `site/assets/js/main.js`, `site/assets/favicon.svg`. `main.js` picks MP4 or WebM with `canPlayType`, fetches it as a Blob behind a loading ring, and scrubs it with lerped, gated seeks. If the film fails, `html.no-film` hides the still and the JS-drawn blueprint (copper circuits that light with scroll) scrubs instead. Also: interactive "Try the review" bench, copper thread down the page, dust canvas.
 - Phase 9 self-test passed: desktop scrub at 0/35/62/95%, flick test, the bench flow, the form, 375/390/768/1024 widths, reduced motion, video-missing fallback, no page errors. Copy gate passes.
 - Test harness: `npm i playwright-core@1.56` in the scratchpad, launch `/opt/pw-browsers/chromium` with `--ignore-certificate-errors`, and use `waitUntil: 'load'` (networkidle hangs).
+- Revision 1 applied (see `design/design-package.md`): outcome headline, sourced stats in the problem section, boxed FAQ, film plays from 641px wide.
 - Private preview artifact: https://claude.ai/artifact/2aaLn4AfMSdZ6oWnqAqWCq (built from `site/` with the html/head/body wrapper stripped).
 
 **Open before launch (Phase 10):** where the demo form sends requests (it only shows a thank-you now), whether the footer should say the imagery is generated, the real domain (og:url/og:image still point at example.com), and connecting Hostinger (not connected; no Hostinger tools yet).

@@ -15,7 +15,7 @@
   };
 
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const small = matchMedia('(max-width: 900px), (pointer: coarse)').matches;
+  const small = matchMedia('(max-width: 640px), (pointer: coarse)').matches;
   const saveData = !!(navigator.connection && navigator.connection.saveData);
   const isFile = location.protocol === 'file:';
 
@@ -279,6 +279,26 @@
       });
     }, { rootMargin: '0px 0px -8% 0px', threshold: 0 });
     targets.forEach((_, t) => io.observe(t));
+  }
+
+  /* ---------- Stat numbers count up once, from a visible resting value ---------- */
+  if (!reduced && 'IntersectionObserver' in window) {
+    const nums = $$('[data-count]');
+    const run = n => {
+      const end = +n.dataset.count, t0 = performance.now(), dur = 1300;
+      const step = t => {
+        const k = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - k, 3);
+        n.textContent = Math.round(end * e);
+        if (k < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    };
+    const so = new IntersectionObserver(es => es.forEach(en => {
+      if (!en.isIntersecting) return;
+      so.unobserve(en.target);
+      $$('[data-count]', en.target).forEach(run);
+    }), { threshold: .4 });
+    $$('.stat').forEach(s => so.observe(s));
   }
 
   /* ---------- The copper thread down the page ---------- */

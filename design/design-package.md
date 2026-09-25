@@ -26,8 +26,8 @@ Action lane: center and right. Captions: left third.
 
 | Band | Scroll | Copy |
 |---|---|---|
-| 1 | 0 to 18% | eyebrow "Division 26 electrical takeoff" / H1 "Every count, with its evidence." |
-| 2 | 26 to 46% | "Upload the bid set. BidMate reads every sheet." |
+| 1 | 0 to 18% | eyebrow "Division 26 electrical takeoff" / H1 "Bid more jobs. Count none of them by hand." / sub "BidMate reads your drawing set and builds the Division 26 takeoff. You check every line against the drawing and approve it." |
+| 2 | 26 to 46% | "Drop in the bid set. BidMate counts every fixture, device and run." |
 | 3 | 52 to 72% | "You check each quantity against the drawing. Nothing counts until you approve it." |
 | settle | 82 to 100% | "Submit a number you can defend." / CTA "Book a demo" |
 
@@ -50,3 +50,9 @@ Copper circuit line that draws itself down the page, linking each section like a
 
 ## Vector layer
 Hand-drawn SVG: floor plan fragments, fixture symbols (circle with cross, receptacle), dashed measurement lines.
+
+## Revision 1 (user feedback)
+- Hero H1 now states the outcome (above).
+- Problem section rewritten: "The margin is six cents. The count has to be right." Four sourced stats (6% net margin, NECA; up to 80% of estimator time counting, Beam AI; 40 to 80 hrs per commercial takeoff, Virtual Estimate; 3 to 5% missed can cost ~10% of profit, Constructem), then a Today / With BidMate comparison.
+- FAQ items are boxed cards.
+- Scroll film now plays down to 641px wide (it was 901px); below that, or on touch devices, the still hero is shown.
