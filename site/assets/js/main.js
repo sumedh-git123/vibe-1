@@ -140,9 +140,15 @@
   const staticHero = reduced || small;
   let videoReady = false, seeking = false, pendingT = null;
 
+  const still = $('[data-still]');
+  const noFilm = () => document.documentElement.classList.add('no-film');
+  still.addEventListener('error', noFilm);
   if (staticHero) {
     document.documentElement.classList.add('static-hero');
     drawPlan(1);
+    still.src = 'assets/media/hero-end.webp';
+  } else if (saveData || isFile) {
+    noFilm();
   }
 
   const heroProgress = () => {
@@ -211,7 +217,9 @@
     const loader = $('[data-loader]'), bar = $('[data-loader-bar]');
     const showTimer = setTimeout(() => { loader.hidden = false; }, 500);
     try {
-      const res = await fetch('assets/media/hero.mp4');
+      const mp4 = video.canPlayType('video/mp4; codecs="avc1.4d401f"');
+      const src = mp4 ? 'assets/media/hero.mp4' : 'assets/media/hero.webm';
+      const res = await fetch(src);
       if (!res.ok) throw new Error('no film');
       const total = +res.headers.get('content-length') || 0;
       let blob;
@@ -223,7 +231,7 @@
           chunks.push(value); got += value.length;
           bar.style.strokeDashoffset = 1 - got / total;
         }
-        blob = new Blob(chunks, { type: 'video/mp4' });
+        blob = new Blob(chunks, { type: mp4 ? 'video/mp4' : 'video/webm' });
       } else {
         blob = await res.blob();
       }
@@ -237,7 +245,8 @@
       document.documentElement.classList.add('has-video');
       lastRendered = -1; render(shown);
     } catch (_) {
-      /* the drawn sheet stays: the page is complete without the film */
+      /* the drawn sheet takes over: the page is complete without the film */
+      noFilm(); lastRendered = -1; render(shown);
     } finally {
       clearTimeout(showTimer);
       loader.hidden = true;

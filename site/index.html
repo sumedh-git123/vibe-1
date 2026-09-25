@@ -11,6 +11,8 @@
   <meta property="og:description" content="Every count, with its evidence. Nothing counts until you approve it.">
   <meta property="og:url" content="https://example.com/">
   <meta property="og:image" content="https://example.com/assets/media/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -49,6 +51,7 @@
         <div class="scene" data-scene aria-hidden="true">
           <svg class="plan" data-plan viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice"></svg>
         </div>
+        <img class="hero-still" data-still src="assets/media/hero-poster.webp" alt="" aria-hidden="true" decoding="async">
         <video class="hero-video" data-video muted playsinline preload="none" aria-hidden="true"></video>
         <div class="scrim" aria-hidden="true"></div>
 
@@ -281,6 +284,7 @@
 
       <!-- FINAL CTA -->
       <section class="section demo" id="demo" data-node>
+        <div class="demo-bg" aria-hidden="true"></div>
         <div class="wrap split">
           <div>
             <p class="eyebrow" data-reveal>Book a demo</p>
