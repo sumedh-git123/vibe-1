@@ -13,6 +13,9 @@ Progress through the skill:
 - Concept chosen: **"The sheet comes alive"**, Tier 1 single 6s shot. Full plan and verbatim copy in `design/design-package.md` (not deployed).
 - Phase 6 step 2: start frame generated (2.75 credits). Job id and URL in `design/assets.md`. Not yet inspected.
 
+- Phase 8 build done ahead of the video (user chose this): `site/index.html`, `site/assets/css/style.css`, `site/assets/js/main.js`, `site/assets/favicon.svg`. The hero is a JS-drawn blueprint whose copper circuits light up with scroll. It is also the fallback and phone hero. `main.js` fetches `assets/media/hero.mp4` as a Blob and switches to the video scrub if present (404 now). Interactive "Try the review" bench, copper thread down the page, dust canvas. Self-tested with Playwright (desktop scroll, bench flow, form, 375/390/768/1024 widths, reduced motion, no page errors). Copy gate passes. Form is a JS-only thank-you state (goes nowhere yet); ask the user where leads should go before launch.
+- Test harness: `npm i playwright-core@1.56` in the scratchpad, launch `/opt/pw-browsers/chromium` with `--ignore-certificate-errors` (the proxy CA breaks Google Fonts otherwise).
+
 **Blocker:** the network policy blocks `d8j0ntlcm91z4.cloudfront.net` (Higgsfield's CDN), so generated media can't be downloaded or inspected here. The user was asked to allow it (likely needs a new session). Next: download and inspect the frame, get the user's OK, preflight 2 to 3 video models, run the video gate, then build in `site/` (index.html + assets/). `review/` and `design/` stay out of the deploy folder. Don't route media around the block through the Higgsfield sandbox; wait for the host to be allowed.
 
 ## Commands

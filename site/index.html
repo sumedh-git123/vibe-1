@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BidMate · Electrical takeoff you can defend</title>
+  <meta name="description" content="BidMate reads your bid set and builds a Division 26 electrical takeoff you review line by line. Every count shows its evidence. Nothing counts until you approve it.">
+  <meta name="theme-color" content="#0E1A26">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="BidMate · Electrical takeoff you can defend">
+  <meta property="og:description" content="Every count, with its evidence. Nothing counts until you approve it.">
+  <meta property="og:url" content="https://example.com/">
+  <meta property="og:image" content="https://example.com/assets/media/og.jpg">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,500..800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <div class="env" aria-hidden="true"><canvas class="dust"></canvas></div>
+
+  <!-- Reusable status icons: shape carries meaning without color -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="i-ready" viewBox="0 0 20 20"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-missing" viewBox="0 0 20 20"><path d="M10 2.8 18 17H2Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M10 8v4.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="10" cy="14.6" r="1.1" fill="currentColor"/></symbol>
+    <symbol id="i-approved" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" fill="currentColor"/><path d="m6.2 10.2 2.6 2.6 5-5.4" fill="none" stroke="#0E1A26" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-fixture" viewBox="0 0 20 20"><circle cx="10" cy="10" r="7" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="m5 5 10 10M15 5 5 15" stroke="currentColor" stroke-width="1.6"/></symbol>
+  </svg>
+
+  <header class="nav" data-nav>
+    <a class="brand" href="#top" aria-label="BidMate home">
+      <svg class="brand-mark" viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path d="m7 7 14 14M21 7 7 21" stroke="currentColor" stroke-width="2"/><circle cx="14" cy="14" r="3" fill="var(--copper)"/></svg>
+      <span>BidMate</span>
+    </a>
+    <nav class="nav-links" aria-label="Main">
+      <a href="#how">How it works</a>
+      <a href="#try">Try the review</a>
+      <a href="#labels">Labels</a>
+      <a href="#faq">Questions</a>
+    </nav>
+    <a class="btn btn-small" href="#demo">Book a demo</a>
+  </header>
+
+  <main id="top">
+    <!-- HERO: scroll-scrubbed. Video when available, drawn sheet otherwise. -->
+    <section class="hero" data-hero aria-label="BidMate introduction">
+      <div class="stage">
+        <div class="scene" data-scene aria-hidden="true">
+          <svg class="plan" data-plan viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice"></svg>
+        </div>
+        <video class="hero-video" data-video muted playsinline preload="none" aria-hidden="true"></video>
+        <div class="scrim" aria-hidden="true"></div>
+
+        <div class="loader" data-loader hidden>
+          <svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="17" class="loader-track"/><circle cx="20" cy="20" r="17" class="loader-bar" data-loader-bar pathLength="1"/></svg>
+          <span data-loader-text>Loading the sheet</span>
+        </div>
+
+        <div class="bands">
+          <div class="band band-1" data-band data-in="0" data-out="0.2">
+            <p class="eyebrow">Division 26 electrical takeoff</p>
+            <h1>Every count,<br>with its evidence.</h1>
+            <p class="scroll-cue"><span></span>Scroll</p>
+          </div>
+          <div class="band" data-band data-in="0.26" data-out="0.46">
+            <p class="band-num">01</p>
+            <p class="band-line">Upload the bid set.<br>BidMate reads every sheet.</p>
+          </div>
+          <div class="band" data-band data-in="0.52" data-out="0.73">
+            <p class="band-num">02</p>
+            <p class="band-line">You check each quantity against the drawing. Nothing counts until you approve it.</p>
+          </div>
+          <div class="band band-settle" data-band data-in="0.82" data-out="1.01">
+            <h2>Submit a number<br>you can defend.</h2>
+            <div class="cta-row">
+              <a class="btn" href="#demo">Book a demo</a>
+              <a class="btn btn-ghost" href="#try">Try the review</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="rest">
+      <svg class="thread" data-thread aria-hidden="true"><path data-thread-path pathLength="1"/></svg>
+
+      <!-- PROBLEM -->
+      <section class="section problem" data-node>
+        <div class="wrap narrow">
+          <p class="eyebrow" data-reveal>The problem</p>
+          <h2 class="display" data-reveal="mask">4:00 p.m.<br>on bid day.</h2>
+          <p class="lede" data-reveal>One missed disconnect. A few circuits nobody counted. That is the margin, gone.</p>
+          <p data-reveal>You answer for every number you submit, even the ones someone else counted. And there is never time to recount the whole set.</p>
+        </div>
+      </section>
+
+      <!-- HOW IT WORKS -->
+      <section class="section how" id="how" data-node>
+        <div class="wrap">
+          <p class="eyebrow" data-reveal>How it works</p>
+          <h2 class="display" data-reveal="mask">Three steps. You stay in charge of all three.</h2>
+          <ol class="steps">
+            <li class="step" data-reveal>
+              <div class="step-art" aria-hidden="true">
+                <svg viewBox="0 0 240 150"><g class="draw"><rect x="40" y="22" width="120" height="100" rx="3"/><rect x="56" y="32" width="120" height="100" rx="3"/><rect x="72" y="42" width="120" height="100" rx="3" class="front"/><path d="M88 62h60M88 76h88M88 90h44M88 104h72" class="thin"/><path d="M200 18v30m-12-12 12-12 12 12" class="cu"/></g></svg>
+              </div>
+              <p class="step-num">01</p>
+              <h3>Upload the set.</h3>
+              <p>Drop in the drawings and specs. Clean vectors or rough scans, BidMate reads them sheet by sheet.</p>
+            </li>
+            <li class="step" data-reveal>
+              <div class="step-art" aria-hidden="true">
+                <svg viewBox="0 0 240 150"><g class="draw"><path d="M20 30h200v100H20z"/><path d="M20 80h90V30M110 80h110M150 80v50" class="thin"/><circle cx="60" cy="55" r="9"/><path d="m54 49 12 12m0-12-12 12" class="thin"/><circle cx="170" cy="106" r="9"/><path d="m164 100 12 12m0-12-12 12" class="thin"/><circle cx="60" cy="55" r="18" class="cu ring"/><path d="M78 55h52v-18h60" class="cu dash"/></g></svg>
+              </div>
+              <p class="step-num">02</p>
+              <h3>Review with the evidence.</h3>
+              <p>Every quantity links to the exact spot on the sheet where it was found. Click it and see it.</p>
+            </li>
+            <li class="step" data-reveal>
+              <div class="step-art" aria-hidden="true">
+                <svg viewBox="0 0 240 150"><g class="draw"><path d="M40 34h160M40 64h160M40 94h160M40 124h110" class="thin"/><circle cx="52" cy="34" r="7"/><circle cx="52" cy="64" r="7"/><circle cx="52" cy="94" r="7"/><path d="m47 34 4 4 7-8M47 64l4 4 7-8M47 94l4 4 7-8" class="cu"/><path d="M160 124h40" class="cu"/></g></svg>
+              </div>
+              <p class="step-num">03</p>
+              <h3>Approve and bid.</h3>
+              <p>You approve line by line. Only approved quantities go into your total.</p>
+            </li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- INTERACTIVE REVIEW -->
+      <section class="section try" id="try" data-node>
+        <div class="wrap">
+          <p class="eyebrow" data-reveal>Try the review</p>
+          <h2 class="display" data-reveal="mask">Approve a few lines. Watch the total.</h2>
+          <p class="lede" data-reveal>A small sample takeoff. Select a line to see where it came from on the sheet.</p>
+
+          <div class="bench" data-bench data-reveal>
+            <div class="bench-bar">
+              <span class="bench-sheet" data-sheet-label>Sample set · First floor electrical</span>
+              <div class="layers" role="group" aria-label="Layers shown on the drawing">
+                <span class="layers-label">Show</span>
+                <label class="toggle"><input type="checkbox" data-layer="ready" checked><span><svg><use href="#i-ready"/></svg>Ready</span></label>
+                <label class="toggle"><input type="checkbox" data-layer="missing" checked><span><svg><use href="#i-missing"/></svg>Missing</span></label>
+                <label class="toggle"><input type="checkbox" data-layer="approved" checked><span><svg><use href="#i-approved"/></svg>Approved</span></label>
+              </div>
+            </div>
+
+            <div class="bench-body">
+              <div class="sheet" aria-hidden="true">
+                <svg class="sheet-svg" data-sheet viewBox="0 0 600 400"></svg>
+                <p class="sheet-note" data-layer-note>Hidden from the drawing. Still in the count.</p>
+              </div>
+
+              <div class="lines">
+                <ul class="line-list" data-lines aria-label="Takeoff lines"></ul>
+                <div class="warning" data-warning hidden aria-live="polite"></div>
+              </div>
+            </div>
+
+            <div class="bench-foot">
+              <div class="tally">
+                <p class="tally-label">Approved lines</p>
+                <p class="tally-num"><span data-count-approved>1</span><span class="of"> of <span data-count-total>6</span></span></p>
+              </div>
+              <div class="tally">
+                <p class="tally-label">Approved devices</p>
+                <p class="tally-num" data-count-devices>9</p>
+              </div>
+              <div class="finish">
+                <p class="finish-state" data-finish-state></p>
+                <button class="btn" type="button" data-finish disabled>Finish takeoff</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- LABELS -->
+      <section class="section labels" id="labels" data-node>
+        <div class="wrap">
+          <p class="eyebrow" data-reveal>One set of labels</p>
+          <h2 class="display" data-reveal="mask">Every screen speaks the same three words.</h2>
+          <p class="lede" data-reveal>Each label has its own shape, its own word and its own color. It reads the same on a monitor, a phone or a gray printout.</p>
+          <div class="label-cards">
+            <article class="label-card s-ready" data-reveal>
+              <svg class="label-icon"><use href="#i-ready"/></svg>
+              <h3>Ready to review</h3>
+              <p>The evidence is there. It needs your eyes before it counts.</p>
+            </article>
+            <article class="label-card s-missing" data-reveal>
+              <svg class="label-icon"><use href="#i-missing"/></svg>
+              <h3>Missing information</h3>
+              <p>Something the count depends on is absent, like a scale or a legend. The takeoff can't finish until it's fixed. No override.</p>
+            </article>
+            <article class="label-card s-approved" data-reveal>
+              <svg class="label-icon"><use href="#i-approved"/></svg>
+              <h3>Estimator approved</h3>
+              <p>A person checked it. Only these lines reach your total.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- WARNINGS -->
+      <section class="section warn" data-node>
+        <div class="wrap split">
+          <div>
+            <p class="eyebrow" data-reveal>Warnings that help</p>
+            <h2 class="display" data-reveal="mask">When something is off, it tells you four things.</h2>
+            <p class="lede" data-reveal>No vague alerts. Every warning says what was found, why it matters, what to check and where to look.</p>
+          </div>
+          <article class="warn-card" data-reveal>
+            <header><svg><use href="#i-missing"/></svg><span>Missing information</span></header>
+            <h3>Scale missing on E-201</h3>
+            <dl>
+              <div><dt>What we found</dt><dd>Sheet E-201 has no drawing scale.</dd></div>
+              <div><dt>Why it matters</dt><dd>Conduit lengths on this sheet can't be measured, so that footage stays out of your total.</dd></div>
+              <div><dt>What to check</dt><dd>Confirm the scale in the title block, or ask the architect.</dd></div>
+              <div><dt>Where it is</dt><dd>Sheet E-201, title block, lower right.</dd></div>
+            </dl>
+          </article>
+        </div>
+      </section>
+
+      <!-- PRINCIPLES -->
+      <section class="section rules" data-node>
+        <div class="wrap">
+          <p class="eyebrow" data-reveal>Built the way you check</p>
+          <h2 class="display" data-reveal="mask">Rules it never bends.</h2>
+          <div class="rule-grid">
+            <div class="rule" data-reveal>
+              <svg viewBox="0 0 60 40" aria-hidden="true"><rect x="4" y="6" width="52" height="28" rx="3"/><path d="M14 20h32" class="cu"/></svg>
+              <h3>Hiding a layer never changes the count.</h3>
+              <p>Clear the clutter off the drawing. The number you're about to bid stays exactly where it was.</p>
+            </div>
+            <div class="rule" data-reveal>
+              <svg viewBox="0 0 60 40" aria-hidden="true"><path d="M30 5 55 35H5Z"/><path d="M30 16v8" class="cu"/></svg>
+              <h3>Gaps block the finish.</h3>
+              <p>If a scale or legend is missing, the takeoff stays open until someone fixes it. There's no button to skip it.</p>
+            </div>
+            <div class="rule" data-reveal>
+              <svg viewBox="0 0 60 40" aria-hidden="true"><path d="M6 30h48" class="cu dash"/><path d="M6 24v12M54 24v12"/></svg>
+              <h3>Unchecked lengths are drawn dashed.</h3>
+              <p>A measurement nobody has verified looks different on the sheet, so you never mistake it for a confirmed one.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FAQ -->
+      <section class="section faq" id="faq" data-node>
+        <div class="wrap narrow">
+          <p class="eyebrow" data-reveal>Questions</p>
+          <h2 class="display" data-reveal="mask">What estimators ask first.</h2>
+          <div class="faq-list">
+            <details data-reveal>
+              <summary>Does it replace my estimator?</summary>
+              <div class="faq-a"><p>No. BidMate does the counting groundwork. Your estimator reviews every quantity and approves it before it counts.</p></div>
+            </details>
+            <details data-reveal>
+              <summary>Our drawings are often rough scans. Will it work?</summary>
+              <div class="faq-a"><p>Yes. BidMate reads them, and anything it can't confirm is marked Missing information or drawn dashed, so you know exactly where to look instead of trusting a guess.</p></div>
+            </details>
+            <details data-reveal>
+              <summary>Can I see where every number came from?</summary>
+              <div class="faq-a"><p>Yes. Every quantity links back to the sheet and the spot where it was found. One click takes you there.</p></div>
+            </details>
+            <details data-reveal>
+              <summary>What does it cover?</summary>
+              <div class="faq-a"><p>Division 26 electrical: lighting fixtures, devices, panels and the runs between them, read from your drawings and specs.</p></div>
+            </details>
+            <details data-reveal>
+              <summary>Can we start now?</summary>
+              <div class="faq-a"><p>We're bringing on a small group of electrical contractors. Book a demo and we'll walk your team through a real bid set.</p></div>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      <!-- FINAL CTA -->
+      <section class="section demo" id="demo" data-node>
+        <div class="wrap split">
+          <div>
+            <p class="eyebrow" data-reveal>Book a demo</p>
+            <h2 class="display" data-reveal="mask">See it on your own drawings.</h2>
+            <p class="lede" data-reveal>Bring a set you've already bid. We'll run it together and you can check every count against your own numbers.</p>
+            <ul class="demo-points" data-reveal>
+              <li><svg><use href="#i-approved"/></svg>30 minutes, with your estimator</li>
+              <li><svg><use href="#i-approved"/></svg>Your drawings, not a canned sample</li>
+              <li><svg><use href="#i-approved"/></svg>No commitment afterward</li>
+            </ul>
+          </div>
+          <form class="form" data-form novalidate data-reveal>
+            <div class="form-fields">
+              <label>Your name<input name="name" autocomplete="name" required></label>
+              <label>Company<input name="company" autocomplete="organization" required></label>
+              <label>Work email<input name="email" type="email" autocomplete="email" required></label>
+              <label>Bids per month
+                <select name="volume">
+                  <option>1 to 5</option>
+                  <option>6 to 15</option>
+                  <option>16 to 40</option>
+                  <option>More than 40</option>
+                </select>
+              </label>
+              <p class="form-error" data-form-error hidden>Please fill in your name, company and a work email.</p>
+              <button class="btn btn-wide" type="submit">Book a demo</button>
+            </div>
+            <div class="form-done" data-form-done hidden tabindex="-1">
+              <svg><use href="#i-approved"/></svg>
+              <h3>Request received.</h3>
+              <p>Thanks. We'll email you within one business day to set a time.</p>
+            </div>
+          </form>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer-inner">
+      <a class="brand" href="#top"><svg class="brand-mark" viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path d="m7 7 14 14M21 7 7 21" stroke="currentColor" stroke-width="2"/><circle cx="14" cy="14" r="3" fill="var(--copper)"/></svg><span>BidMate</span></a>
+      <p>Electrical takeoff you can defend.</p>
+      <p class="footer-small">© 2026 BidMate</p>
+    </div>
+  </footer>
+
+  <script src="assets/js/main.js" defer></script>
+</body>
+</html>
