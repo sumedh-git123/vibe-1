@@ -4,51 +4,20 @@ Project notes and handoff for future sessions. Read this first.
 
 ## Current status
 
-**The project is changing direction.** The repo holds a finished "Glacier" landing page. The user has asked to scrap it and build a new marketing site for **BidMate**, using the **10k-websites** skill in `.claude/skills/10k-websites/SKILL.md`. That new site has not been started yet. It is blocked on information from the user (see "What's left to do").
+**Building the BidMate marketing site with the 10k-websites skill.** Glacier has been deleted (its React/Vite files are gone from the branch). Branch: `claude/glacier-landing-hero-nopr04`, no PR.
 
-- Working branch: `claude/glacier-landing-hero-nopr04`. All work goes here, and no pull request has been opened.
-- `main` holds only the initial `.gitignore` commit.
+Progress through the skill:
+- Phase 1 done: Higgsfield connected (Starter plan, 280 credits at start). ffmpeg: the system has none with web encoders, so `pip install imageio-ffmpeg` and symlink its binary to `~/.local/bin/ffmpeg` (has libx264, libwebp, vp9). Node 22 present. The skill's `references/` folder is still missing; going ahead without it, user informed.
+- Phase 2 answers: CTA **Book a demo**. Feeling **precise and calm**. No assets: design a wordmark, generate the hero, draw product UI as in-page illustrations. Real product, generated imagery (disclosure question not yet asked).
+- Phase 3 research done (Mike Holt forum, Capterra/Quotr reviews): fear of what gets missed, "you are still responsible", tools choke on bad scans and odd symbols, no time to recount on bid day.
+- Concept chosen: **"The sheet comes alive"**, Tier 1 single 6s shot. Full plan and verbatim copy in `design/design-package.md` (not deployed).
+- Phase 6 step 2: start frame generated (2.75 credits). Job id and URL in `design/assets.md`. Not yet inspected.
+
+**Blocker:** the network policy blocks `d8j0ntlcm91z4.cloudfront.net` (Higgsfield's CDN), so generated media can't be downloaded or inspected here. The user was asked to allow it (likely needs a new session). Next: download and inspect the frame, get the user's OK, preflight 2 to 3 video models, run the video gate, then build in `site/` (index.html + assets/). `review/` and `design/` stay out of the deploy folder. Don't route media around the block through the Higgsfield sandbox; wait for the host to be allowed.
 
 ## Commands
 
-```
-npm install
-npm run dev      # Vite dev server
-npm run build    # tsc -b && vite build
-npm run lint     # eslint .
-npm run preview  # serve the production build
-```
-
-## Stack
-
-- Vite 8 + React 19 + TypeScript (~5.9)
-- Tailwind CSS v4 through the `@tailwindcss/vite` plugin. CSS is pulled in with `@import "tailwindcss";` in `src/index.css`. There is no `tailwind.config.js`.
-- `framer-motion` for all animation
-- Google Fonts (Playfair Display, Inter) loaded by `<link>` tags in `index.html`
-- ESLint 9 flat config (`eslint.config.js`) with react-hooks and react-refresh plugins
-
-## What's been built: the Glacier landing page
-
-This was built from a detailed one-shot prompt that gave the exact source of every file. The code matches that spec literally. `npm run build` and `npm run lint` both pass. It has **not** been checked visually in a browser.
-
-| File | Contents |
-| --- | --- |
-| `index.html` | Title "Glacier", favicon, Google Fonts links |
-| `src/index.css` | Tailwind import plus base resets (black background, Inter, antialiasing) |
-| `src/main.tsx`, `src/App.tsx` | Render `<Navbar />` then `<Hero />` |
-| `src/components/Navbar.tsx` | Fixed floating glass "icon dock": four icon buttons (home, tasks, calendar, goals) with a sliding active highlight that uses a framer-motion `layoutId` |
-| `src/components/Hero.tsx` | Full-screen hero with a background video, dark overlays, the "GLACIER / PRESENTS" brand lockup, the "FROZEN / IN TIME" Playfair headline, an italic subtitle, an oval "Enter Exhibit" button, and a footer bar (social icons, privacy/terms links, "Scroll to navigate") |
-| `public/favicon.svg` | Placeholder ice-gem icon (the spec allowed any placeholder) |
-
-Files added beyond the spec, as standard Vite React-TS scaffolding: `tsconfig.json`, `tsconfig.app.json`, `tsconfig.node.json`, `eslint.config.js`, and `node_modules` / `dist` entries in `.gitignore`.
-
-## Decisions made
-
-- **The project lives at the repo root**, not in a `glacier/` subfolder, because the repo was empty apart from `.gitignore`.
-- **The spec was followed exactly.** Inline `style` props, the `borderRadius: '50%'` ellipse button and the overlay opacity values are all intentional. Don't "clean them up" while Glacier still exists.
-- **The Glacier hero video was never added.** `public/hero.mp4` is missing because the environment's network policy blocked the video's host (`pub-1e5b4001b36b47e28e6a2fb775966a79.r2.dev`). The user allowed the domain, but the running session was still blocked. The change most likely only applies to new sessions. Now that the project is moving to BidMate, the video is probably no longer needed.
-- **Glacier is being replaced by BidMate.** The user said "scratch this whole thing." The BidMate site goes on this same branch.
-- **BidMate follows the 10k-websites skill.** The user chose the skill over the current stack. The skill requires one `index.html` plus an `assets/` folder in plain HTML, CSS and vanilla JS, with no framework, no build step and no npm. So the whole Vite/React/Tailwind setup described above (`src/`, `package.json`, the tsconfig and eslint files) is removed when the BidMate build starts. The "Commands" and "Stack" sections then stop applying and should be rewritten.
+No build step. Preview: `cd site && npx http-server -p 8080` (or `python3 -m http.server`).
 
 ## The BidMate brief (from the user)
 
@@ -75,32 +44,6 @@ It runs in 11 phases: setup scan, design conversation, customer research, depth 
   - Node.js 22 and Python 3.11 are installed.
   - `ffmpeg` is **not** on the PATH. A Playwright build exists at `/opt/pw-browsers/ffmpeg-1011/ffmpeg-linux`, but it may lack the encoders the skill's recipes need.
 - **This is a cloud session, not the desktop setup the skill assumes.** Its steps about winget/brew installs, double-clicking `index.html` and clicking through Claude Code's connector menu need adapting here.
-
-## What's left to do
-
-### Blocked: needs input from the user
-
-1. **What BidMate is.** Nothing is known yet. The following questions were put to the user:
-   - What the product does and who it's for
-   - The main call to action (sign up, waitlist, book a demo, download)
-   - Any existing brand assets: logo, colors, tagline, feature list. If there are none, write placeholder copy and choose a visual direction.
-2. **Access to the reference site.** `hermes-agent.nousresearch.com` is blocked by the network policy for both `curl` and `WebFetch`, so it has never been seen. The two options put to the user:
-   - Add the domain under **Network access** in the environment settings, then start a **new** session. Changes did not reach the already-running session last time.
-   - Or send screenshots of the parts they like, and name the interactions they want (hover effects, animated text, a live terminal, scroll-triggered motion, and so on).
-
-   Do not guess what the reference looks like. Wait for access or screenshots.
-3. **The skill's missing `references/` files** (see above).
-
-Note that the skill's Phase 2 conversation asks for most of item 1 anyway. Collect it there, as clickable questions, one at a time.
-
-### Once unblocked
-
-4. Run the skill from Phase 1: scan the tools, report a ✓/✗ checklist, verify Higgsfield with a balance call.
-5. Remove the Glacier project entirely: `src/`, `package.json`, `package-lock.json`, the tsconfig and eslint files, `vite.config.ts`, `index.html` and `public/`.
-6. Follow the skill's phases to design, generate and build the BidMate site as plain `index.html` plus `assets/`. Keep raw and review media out of the deploy folder, as the skill requires.
-7. Check it in a real browser before showing it. Chromium is pre-installed at `/opt/pw-browsers/chromium`. Follow the skill's Phase 9 self-test and copy-review gate.
-8. Commit and push to `claude/glacier-landing-hero-nopr04`. Deploying to Hostinger happens only when the user says they're ready (Phase 10).
-9. Open a pull request into `main` **only if the user asks** for one.
 
 ## Environment notes
 
