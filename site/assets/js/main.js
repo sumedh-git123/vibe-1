@@ -17,7 +17,6 @@
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const small = matchMedia('(max-width: 640px), (pointer: coarse)').matches;
   const saveData = !!(navigator.connection && navigator.connection.saveData);
-  const isFile = location.protocol === 'file:';
 
   /* ---------- Nav ---------- */
   const nav = $('[data-nav]');
@@ -133,29 +132,89 @@
 
   buildPlan();
 
-  /* ---------- Hero: scroll engine ---------- */
+  /* ---------- The film: one image sequence behind the whole site ----------
+     Frames are plain images drawn to a fixed canvas, so they work in every
+     browser and on phones. The hero plays most of the shot; the rest of the
+     page keeps it moving slowly, so every section sits inside the same scene. */
   const hero = $('[data-hero]');
-  const video = $('[data-video]');
   const bands = $$('[data-band]').map(b => ({ el: b, a: +b.dataset.in, b: +b.dataset.out, o: -1 }));
-  const staticHero = reduced || small;
-  let videoReady = false, seeking = false, pendingT = null;
+  const root = document.documentElement;
+  const staticHero = reduced;
+  const FILM = small ? { dir: 'm', n: 73 } : { dir: 'd', n: 145 };
+  const HERO_SHARE = .64;           // share of the shot played inside the hero
+  const canvas = $('[data-film]'), ctx = canvas.getContext('2d'), veil = $('[data-veil]');
+  const frames = new Array(FILM.n);
+  let filmReady = false, drawnIdx = -1, cw = 0, ch = 0;
 
-  const still = $('[data-still]');
-  const noFilm = () => document.documentElement.classList.add('no-film');
-  still.addEventListener('error', noFilm);
-  if (staticHero) {
-    document.documentElement.classList.add('static-hero');
-    drawPlan(1);
-    still.src = 'assets/media/hero-end.webp';
-  } else if (saveData || isFile) {
-    noFilm();
+  const noFilm = () => root.classList.add('no-film');
+  if (staticHero) { root.classList.add('static-hero'); drawPlan(1); }
+
+  function sizeCanvas() {
+    const dpr = Math.min(small ? 2 : 1.5, devicePixelRatio || 1);
+    cw = Math.round(innerWidth * dpr); ch = Math.round(innerHeight * dpr);
+    if (canvas.width !== cw || canvas.height !== ch) { canvas.width = cw; canvas.height = ch; drawnIdx = -1; }
+  }
+  function nearest(i) {
+    for (let d = 0; d < FILM.n; d++) {
+      if (frames[i - d]) return i - d;
+      if (frames[i + d]) return i + d;
+    }
+    return -1;
+  }
+  function drawFrame(i) {
+    const k = nearest(i);
+    if (k < 0 || k === drawnIdx) return;
+    drawnIdx = k;
+    const im = frames[k];
+    const s = Math.max(cw / im.naturalWidth, ch / im.naturalHeight);
+    const w = im.naturalWidth * s, h = im.naturalHeight * s;
+    const x = (cw - w) * (small ? .62 : .5), y = (ch - h) / 2;   // phones keep the lit circuit in view
+    ctx.drawImage(im, x, y, w, h);
   }
 
-  const heroProgress = () => {
-    const r = hero.getBoundingClientRect();
-    const span = hero.offsetHeight - innerHeight;
-    return span > 0 ? clamp(-r.top / span) : 0;
-  };
+  function loadFrame(i) {
+    return new Promise(res => {
+      if (frames[i]) return res();
+      const im = new Image();
+      im.decoding = 'async';
+      im.onload = () => { frames[i] = im; res(); };
+      im.onerror = () => res();
+      im.src = `assets/film/${FILM.dir}/${String(i + 1).padStart(3, '0')}.webp`;
+    });
+  }
+  async function loadFilm() {
+    const loader = $('[data-loader]'), bar = $('[data-loader-bar]');
+    const showTimer = setTimeout(() => { loader.hidden = false; }, 600);
+    await loadFrame(0);
+    if (!frames[0]) { clearTimeout(showTimer); loader.hidden = true; noFilm(); render(true); return; }
+    sizeCanvas();
+    filmReady = true;
+    root.classList.add('has-film');
+    render(true);
+    if (staticHero) {                       // reduced motion: rest on the finished frame
+      await loadFrame(FILM.n - 1); drawnIdx = -1; drawFrame(FILM.n - 1);
+      clearTimeout(showTimer); loader.hidden = true; return;
+    }
+    // coarse pass first so scrubbing works almost at once, then fill the gaps
+    const order = [], seen = new Set([0]);
+    for (const step of [16, 8, 4, 2, 1]) {
+      for (let i = 0; i < FILM.n; i += step) if (!seen.has(i)) { seen.add(i); order.push(i); }
+    }
+    if (!seen.has(FILM.n - 1)) order.push(FILM.n - 1);
+    const firstPass = Math.ceil(FILM.n / 8);
+    let done = 0, next = 0;
+    const worker = async () => {
+      while (next < order.length) {
+        await loadFrame(order[next++]);
+        done++;
+        if (done <= firstPass) bar.style.strokeDashoffset = 1 - done / firstPass;
+        if (done === firstPass) { clearTimeout(showTimer); loader.hidden = true; }
+        drawnIdx = -1; render(true);
+      }
+    };
+    await Promise.all(Array.from({ length: 6 }, worker));
+    clearTimeout(showTimer); loader.hidden = true;
+  }
 
   function renderBands(p) {
     const f = .045;
@@ -173,86 +232,53 @@
     });
   }
 
-  function seek(p) {
-    if (!videoReady || !video.duration) return;
-    const t = Math.min(video.duration - .04, p * video.duration);
-    if (seeking) { pendingT = t; return; }
-    if (Math.abs(video.currentTime - t) < 1 / 90) return;
-    seeking = true;
-    video.currentTime = t;
+  // Scroll position mapped to: hero progress, film position, veil and camera drift
+  function scene() {
+    const heroSpan = Math.max(1, hero.offsetHeight - innerHeight);
+    const pageSpan = Math.max(heroSpan + 1, document.documentElement.scrollHeight - innerHeight);
+    const y = scrollY;
+    const hp = clamp(y / heroSpan);
+    const rp = clamp((y - heroSpan) / (pageSpan - heroSpan));
+    return { y, hp, rp };
   }
-  video.addEventListener('seeked', () => {
-    seeking = false;
-    if (pendingT !== null) {
-      const t = pendingT; pendingT = null;
-      if (Math.abs(video.currentTime - t) >= 1 / 90) { seeking = true; video.currentTime = t; }
-    }
-  });
+  let target = scene(), shown = { ...target }, running = false, last = {};
+  const lerp = (a, b, t) => a + (b - a) * t;
 
-  let target = 0, shown = 0, lastRendered = -1, running = false;
-  function render(p) {
-    if (p === lastRendered) return;
-    lastRendered = p;
-    renderBands(p);
-    if (videoReady) seek(p); else drawPlan(p);
+  function render(force) {
+    const { hp, rp } = shown;
+    if (force || hp !== last.hp) { renderBands(hp); if (!filmReady) drawPlan(hp); }
+    if (!filmReady || staticHero) { last = { hp, rp }; return; }
+    // film: most of the shot in the hero, the rest spread over the page
+    const f = hp < 1 ? hp * HERO_SHARE : HERO_SHARE + rp * (1 - HERO_SHARE);
+    drawFrame(Math.round(f * (FILM.n - 1)));
+    if (force || rp !== last.rp || hp !== last.hp) {
+      // the scene dims behind reading sections and opens up again at the final ask
+      const into = ramp(hp, .9, 1);
+      const v = hp < 1 ? into * .5 : lerp(.5, .66, ramp(rp, 0, .12)) - ramp(rp, .84, 1) * .26;
+      veil.style.opacity = v.toFixed(3);
+      const sc = 1 + rp * .22, tx = -rp * 4, ty = rp * 3;
+      canvas.style.transform = `translate3d(${tx.toFixed(2)}%, ${ty.toFixed(2)}%, 0) scale(${sc.toFixed(4)})`;
+    }
+    last = { hp, rp };
   }
   function tick() {
-    const d = target - shown;
-    shown = Math.abs(d) < .0004 ? target : shown + d * .14;
-    render(shown);
-    if (shown !== target) requestAnimationFrame(tick); else running = false;
+    const k = reduced ? 1 : .14;
+    let settled = true;
+    for (const key of ['hp', 'rp']) {
+      const d = target[key] - shown[key];
+      if (Math.abs(d) < .0004) shown[key] = target[key]; else { shown[key] += d * k; settled = false; }
+    }
+    render(false);
+    if (!settled) requestAnimationFrame(tick); else running = false;
   }
-  function onHeroScroll() {
-    target = heroProgress();
+  function onScroll() {
+    target = scene();
     if (!running) { running = true; requestAnimationFrame(tick); }
   }
-  if (!staticHero) {
-    addEventListener('scroll', onHeroScroll, { passive: true });
-    addEventListener('resize', onHeroScroll);
-    onHeroScroll();
-  }
-
-  /* Load the hero film as a Blob so every seek is local. Falls back to the drawn sheet. */
-  async function loadVideo() {
-    const loader = $('[data-loader]'), bar = $('[data-loader-bar]');
-    const showTimer = setTimeout(() => { loader.hidden = false; }, 500);
-    try {
-      const mp4 = video.canPlayType('video/mp4; codecs="avc1.4d401f"');
-      const src = mp4 ? 'assets/media/hero.mp4' : 'assets/media/hero.webm';
-      const res = await fetch(src);
-      if (!res.ok) throw new Error('no film');
-      const total = +res.headers.get('content-length') || 0;
-      let blob;
-      if (res.body && total) {
-        const reader = res.body.getReader(); const chunks = []; let got = 0;
-        for (;;) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          chunks.push(value); got += value.length;
-          bar.style.strokeDashoffset = 1 - got / total;
-        }
-        blob = new Blob(chunks, { type: mp4 ? 'video/mp4' : 'video/webm' });
-      } else {
-        blob = await res.blob();
-      }
-      video.src = URL.createObjectURL(blob);
-      await new Promise((ok, bad) => {
-        video.addEventListener('loadeddata', ok, { once: true });
-        video.addEventListener('error', bad, { once: true });
-        video.load();
-      });
-      videoReady = true;
-      document.documentElement.classList.add('has-video');
-      lastRendered = -1; render(shown);
-    } catch (_) {
-      /* the drawn sheet takes over: the page is complete without the film */
-      noFilm(); lastRendered = -1; render(shown);
-    } finally {
-      clearTimeout(showTimer);
-      loader.hidden = true;
-    }
-  }
-  if (!staticHero && !saveData && !isFile) loadVideo();
+  addEventListener('scroll', onScroll, { passive: true });
+  addEventListener('resize', () => { sizeCanvas(); onScroll(); render(true); });
+  render(true);
+  if (saveData) noFilm(); else loadFilm();
 
   /* ---------- Reveals ---------- */
   $$('.step-art .draw > *').forEach(n => n.setAttribute('pathLength', 1));

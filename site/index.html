@@ -20,7 +20,12 @@
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-  <div class="env" aria-hidden="true"><canvas class="dust"></canvas></div>
+  <div class="env" aria-hidden="true">
+    <canvas class="film" data-film></canvas>
+    <div class="film-veil" data-veil></div>
+    <div class="env-grid"></div>
+    <canvas class="dust"></canvas>
+  </div>
 
   <!-- Reusable status icons: shape carries meaning without color -->
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -51,13 +56,11 @@
         <div class="scene" data-scene aria-hidden="true">
           <svg class="plan" data-plan viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice"></svg>
         </div>
-        <img class="hero-still" data-still src="assets/media/hero-poster.webp" alt="" aria-hidden="true" decoding="async">
-        <video class="hero-video" data-video muted playsinline preload="none" aria-hidden="true"></video>
         <div class="scrim" aria-hidden="true"></div>
 
         <div class="loader" data-loader hidden>
           <svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="17" class="loader-track"/><circle cx="20" cy="20" r="17" class="loader-bar" data-loader-bar pathLength="1"/></svg>
-          <span data-loader-text>Loading the sheet</span>
+          <span data-loader-text>Loading the film</span>
         </div>
 
         <div class="bands">
@@ -328,7 +331,6 @@
 
       <!-- FINAL CTA -->
       <section class="section demo" id="demo" data-node>
-        <div class="demo-bg" aria-hidden="true"></div>
         <div class="wrap split">
           <div>
             <p class="eyebrow" data-reveal>Book a demo</p>

@@ -38,19 +38,18 @@ a { color: inherit; }
 ::selection { background: var(--copper); color: var(--ink); }
 :focus-visible { outline: 2px solid var(--copper); outline-offset: 3px; border-radius: 4px; }
 
-/* Fixed background environment: blueprint grid + dust */
-.env {
-  position: fixed; inset: 0; z-index: -1; pointer-events: none;
+/* Fixed background environment: the film runs behind the whole site */
+.env { position: fixed; inset: 0; z-index: -1; pointer-events: none; background: var(--ink); overflow: hidden; }
+.film { position: absolute; inset: 0; width: 100%; height: 100%; transform-origin: 60% 55%; will-change: transform; opacity: 0; transition: opacity 1s var(--ease); }
+.has-film .film { opacity: 1; }
+.film-veil { position: absolute; inset: 0; background: var(--ink); opacity: 0; will-change: opacity; }
+.env-grid { position: absolute; inset: 0;
   background:
-    radial-gradient(120% 80% at 70% 0%, rgba(127,179,207,.07), transparent 60%),
     linear-gradient(var(--line-dim) 1px, transparent 1px) 0 0 / 48px 48px,
-    linear-gradient(90deg, var(--line-dim) 1px, transparent 1px) 0 0 / 48px 48px,
-    var(--ink);
-}
-.env::after {
-  content: ""; position: absolute; inset: 0;
-  background: radial-gradient(120% 90% at 50% 50%, transparent 40%, rgba(8,15,22,.75));
-}
+    linear-gradient(90deg, var(--line-dim) 1px, transparent 1px) 0 0 / 48px 48px;
+  opacity: .5; }
+.has-film .env-grid { opacity: .22; }
+.env::after { content: ""; position: absolute; inset: 0; background: radial-gradient(120% 90% at 50% 50%, transparent 45%, rgba(8,15,22,.7)); }
 .dust { position: absolute; inset: 0; width: 100%; height: 100%; opacity: .7; }
 
 /* Type */
@@ -137,11 +136,8 @@ p { margin: 0 0 14px; }
 .plan .run-ghost { fill: none; stroke: var(--line); stroke-width: 1; stroke-dasharray: 4 6; opacity: .22; }
 .plan .panel { fill: var(--ink-3); stroke: var(--copper); stroke-width: 2; }
 
-.hero-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .8s var(--ease); }
-.has-video .hero-video { opacity: 1; }
-.hero-still { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity .8s var(--ease); }
-.no-film .hero-still, .has-video .hero-still { opacity: 0; }
-.has-video .scene { opacity: 0; transition: opacity .8s; }
+.scene { transition: opacity .8s; }
+.has-film .scene { opacity: 0; }
 .scrim {
   position: absolute; inset: 0; pointer-events: none;
   background:
@@ -338,10 +334,6 @@ p { margin: 0 0 14px; }
 .faq-a { overflow: hidden; }
 .faq-a p { padding: 0 24px 22px; max-width: 64ch; margin: 0; }
 
-/* Demo: the film's last frame returns behind the final ask */
-.demo { overflow: hidden; }
-.demo-bg { position: absolute; inset: 0; z-index: -1; background: url("../media/hero-end.webp") center 30% / cover no-repeat; opacity: .22;
-  -webkit-mask-image: linear-gradient(180deg, transparent, #000 30%, #000 70%, transparent); mask-image: linear-gradient(180deg, transparent, #000 30%, #000 70%, transparent); }
 /* Demo */
 .demo-points { list-style: none; padding: 0; margin: 28px 0 0; display: grid; gap: 12px; }
 .demo-points li { display: flex; gap: 10px; align-items: center; color: var(--paper); }
@@ -400,7 +392,7 @@ p { margin: 0 0 14px; }
   .finish { grid-column: 1 / -1; justify-self: stretch; justify-content: space-between; text-align: left; }
   .finish-state { justify-content: flex-start; }
   .band { width: calc(100% - 2 * var(--gutter)); }
-  .scrim { background: linear-gradient(180deg, rgba(14,26,38,.55) 0%, rgba(14,26,38,.35) 40%, rgba(14,26,38,.92) 100%); }
+  .scrim { background: linear-gradient(180deg, rgba(14,26,38,.4) 0%, rgba(14,26,38,.28) 35%, rgba(14,26,38,.5) 60%, rgba(14,26,38,.8) 100%); }
   .thread { display: none; }
 }
 @media (max-width: 560px) {
@@ -422,3 +414,10 @@ p { margin: 0 0 14px; }
   [data-reveal] { opacity: 1; transform: none; clip-path: none; }
 }
 .mini:disabled { opacity: .4; cursor: default; pointer-events: none; }
+
+/* Glass: panels float over the film instead of hiding it */
+.step, .bench, .label-card, .warn-card, .faq-list details, .form, .compare-col, .nav {
+  -webkit-backdrop-filter: blur(12px) saturate(1.15); backdrop-filter: blur(12px) saturate(1.15);
+}
+.bench { background: rgba(15,28,41,.8); }
+.step { background: linear-gradient(180deg, rgba(19,36,51,.72), rgba(14,26,38,.5)); }

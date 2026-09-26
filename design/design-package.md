@@ -56,3 +56,6 @@ Hand-drawn SVG: floor plan fragments, fixture symbols (circle with cross, recept
 - Problem section rewritten: "The margin is six cents. The count has to be right." Four sourced stats (6% net margin, NECA; up to 80% of estimator time counting, Beam AI; 40 to 80 hrs per commercial takeoff, Virtual Estimate; 3 to 5% missed can cost ~10% of profit, Constructem), then a Today / With BidMate comparison.
 - FAQ items are boxed cards.
 - Scroll film now plays down to 641px wide (it was 901px); below that, or on touch devices, the still hero is shown.
+
+## Revision 2 (user feedback)
+- The film runs behind the entire site as a canvas image sequence (see CLAUDE.md). Hero = 64% of the shot; the remaining 36% plays across the rest of the page with a slow push-in, so every section sits in the same lit blueprint.
