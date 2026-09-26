@@ -32,6 +32,7 @@
     <symbol id="i-ready" viewBox="0 0 20 20"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
     <symbol id="i-missing" viewBox="0 0 20 20"><path d="M10 2.8 18 17H2Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M10 8v4.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="10" cy="14.6" r="1.1" fill="currentColor"/></symbol>
     <symbol id="i-approved" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" fill="currentColor"/><path d="m6.2 10.2 2.6 2.6 5-5.4" fill="none" stroke="#0E1A26" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-x" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" fill="currentColor"/><path d="m7 7 6 6m0-6-6 6" stroke="#0E1A26" stroke-width="2.2" stroke-linecap="round"/></symbol>
     <symbol id="i-fixture" viewBox="0 0 20 20"><circle cx="10" cy="10" r="7" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="m5 5 10 10M15 5 5 15" stroke="currentColor" stroke-width="1.6"/></symbol>
   </svg>
 
@@ -96,8 +97,8 @@
       <section class="section problem" data-node>
         <div class="wrap">
           <p class="eyebrow" data-reveal>The problem</p>
-          <h2 class="display" data-reveal="mask">The margin is six cents.<br>The count has to be right.</h2>
-          <p class="lede" data-reveal>Electrical work is bid on thin margins, and most of an estimator's week goes into counting symbols by hand. One missed disconnect or a few uncounted circuits can wipe out the profit on a job.</p>
+          <h2 class="display" data-reveal="mask">Six cents on the dollar.<br><span class="hl-bad">One missed count takes it.</span></h2>
+          <p class="lede" data-reveal>Electrical work is bid on <strong>razor-thin margins</strong>. Most of an estimator's week goes into <strong>counting symbols by hand</strong>. One missed disconnect or a few uncounted circuits can <strong class="bad">wipe out the profit on a job</strong>.</p>
 
           <div class="stats">
             <figure class="stat" data-reveal>
@@ -122,25 +123,29 @@
             </figure>
           </div>
 
-          <div class="compare" data-reveal>
-            <div class="compare-col">
-              <p class="compare-head">Today</p>
-              <ul>
-                <li>Counting fixtures and devices by hand, sheet after sheet</li>
-                <li>Rough scans and odd symbols slip past without a warning</li>
-                <li>Counts from a service or a tool you can't check</li>
-                <li>Recounting the whole set at 4 p.m. on bid day</li>
-              </ul>
+          <div class="bidday" data-bidday data-reveal>
+            <div class="bd-head">
+              <div>
+                <p class="bd-kicker">Try it · bid day, two ways</p>
+                <p class="bd-job">Example job: <strong>$1.2M electrical bid</strong> at a 6% margin, <strong>$72,000</strong> of profit on paper.</p>
+              </div>
+              <div class="bd-switch" role="group" aria-label="How the takeoff was done">
+                <button type="button" data-mode="hand" aria-pressed="true">Counted by hand</button>
+                <button type="button" data-mode="bm" aria-pressed="false">With BidMate</button>
+                <span class="bd-thumb" aria-hidden="true"></span>
+              </div>
             </div>
-            <div class="compare-col is-fix">
-              <p class="compare-head">With BidMate</p>
-              <ul>
-                <li><svg><use href="#i-approved"/></svg>The whole set is read and counted for you</li>
-                <li><svg><use href="#i-approved"/></svg>Anything unclear is flagged as Missing information</li>
-                <li><svg><use href="#i-approved"/></svg>Every number links to the spot where it was found</li>
-                <li><svg><use href="#i-approved"/></svg>You approve each line, so the total is yours</li>
-              </ul>
+            <div class="bd-body">
+              <ul class="bd-items" data-bd-items aria-live="polite"></ul>
+              <div class="bd-meter">
+                <p class="bd-label">Profit left on this job</p>
+                <p class="bd-profit" data-bd-profit>$72,000</p>
+                <div class="bd-bar" aria-hidden="true"><span class="bd-fill" data-bd-fill></span></div>
+                <p class="bd-note" data-bd-note></p>
+                <button type="button" class="btn bd-all" data-bd-all hidden>Approve all four</button>
+              </div>
             </div>
+            <p class="bd-foot">Example numbers for illustration. Items and costs are typical of a mid-size commercial job.</p>
           </div>
         </div>
       </section>

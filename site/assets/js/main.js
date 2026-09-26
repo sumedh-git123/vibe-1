@@ -132,6 +132,29 @@
 
   buildPlan();
 
+  /* ---------- Split headings into words for the rising, unblurring entrance ---------- */
+  function splitWords(root) {
+    let i = 0;
+    const walk = node => {
+      Array.from(node.childNodes).forEach(ch => {
+        if (ch.nodeType === 3) {
+          const parts = ch.textContent.split(/(\s+)/);
+          const frag = document.createDocumentFragment();
+          parts.forEach(t => {
+            if (!t) return;
+            if (/^\s+$/.test(t)) { frag.appendChild(document.createTextNode(t)); return; }
+            const s = document.createElement('span');
+            s.className = 'w'; s.textContent = t; s.style.setProperty('--wi', i++);
+            frag.appendChild(s);
+          });
+          node.replaceChild(frag, ch);
+        } else if (ch.nodeType === 1 && ch.tagName !== 'BR') walk(ch);
+      });
+    };
+    walk(root);
+  }
+  $$('[data-reveal="mask"], .band h1, .band h2, .band-line').forEach(splitWords);
+
   /* ---------- The film: one image sequence behind the whole site ----------
      Frames are plain images drawn to a fixed canvas, so they work in every
      browser and on phones. The hero plays most of the shot; the rest of the
@@ -140,7 +163,7 @@
   const bands = $$('[data-band]').map(b => ({ el: b, a: +b.dataset.in, b: +b.dataset.out, o: -1 }));
   const root = document.documentElement;
   const staticHero = reduced;
-  const FILM = small ? { dir: 'm', n: 73 } : { dir: 'd', n: 145 };
+  const FILM = small ? { dir: 'm', n: 75 } : { dir: 'd', n: 150 };
   const HERO_SHARE = .64;           // share of the shot played inside the hero
   const canvas = $('[data-film]'), ctx = canvas.getContext('2d'), veil = $('[data-veil]');
   const frames = new Array(FILM.n);
@@ -161,15 +184,31 @@
     }
     return -1;
   }
-  function drawFrame(i) {
-    const k = nearest(i);
-    if (k < 0 || k === drawnIdx) return;
-    drawnIdx = k;
-    const im = frames[k];
+  function paint(im, alpha) {
     const s = Math.max(cw / im.naturalWidth, ch / im.naturalHeight);
     const w = im.naturalWidth * s, h = im.naturalHeight * s;
     const x = (cw - w) * (small ? .62 : .5), y = (ch - h) / 2;   // phones keep the lit circuit in view
+    ctx.globalAlpha = alpha;
     ctx.drawImage(im, x, y, w, h);
+    ctx.globalAlpha = 1;
+  }
+  // Float frame position: the two neighbouring frames are cross-blended,
+  // so motion stays smooth however slowly the page is scrolled.
+  function drawFrame(fi) {
+    const i0 = Math.floor(fi), i1 = Math.min(FILM.n - 1, i0 + 1), frac = fi - i0;
+    const key = i0 + Math.round(frac * 24) / 24;
+    if (key === drawnIdx) return;
+    const a = frames[i0], b = frames[i1];
+    if (a && b) {
+      drawnIdx = key;
+      paint(a, 1);
+      if (frac > .02 && i1 !== i0) paint(b, frac);
+      return;
+    }
+    const k = nearest(Math.round(fi));
+    if (k < 0) return;
+    drawnIdx = -2 - k;
+    paint(frames[k], 1);
   }
 
   function loadFrame(i) {
@@ -216,19 +255,31 @@
     clearTimeout(showTimer); loader.hidden = true;
   }
 
+  bands.forEach(bd => {
+    bd.words = $$('.w', bd.el);
+    bd.rest = Array.from(bd.el.children).filter(c => !c.querySelector('.w') && !c.classList.contains('w'));
+  });
   function renderBands(p) {
-    const f = .045;
     bands.forEach(bd => {
-      const inO = bd.a <= 0 ? 1 : ramp(p, bd.a, bd.a + f);
-      const outO = bd.b > 1 ? 1 : 1 - ramp(p, bd.b - f, bd.b);
-      const o = Math.round(Math.min(inO, outO) * 1000) / 1000;
-      if (o === bd.o) return;
-      bd.o = o;
-      const mid = (bd.a + bd.b) / 2;
-      const y = (1 - o) * (p < mid ? 18 : -18);
-      bd.el.style.opacity = o;
-      bd.el.style.transform = `translateY(calc(-50% + ${y.toFixed(1)}px))`;
-      bd.el.setAttribute('aria-hidden', o < .5 ? 'true' : 'false');
+      const inP = bd.a <= 0 ? 1 : ramp(p, bd.a, bd.a + .075);
+      const outP = bd.b > 1 ? 0 : ramp(p, bd.b - .06, bd.b);
+      const key = Math.round(inP * 500) + ':' + Math.round(outP * 500);
+      if (key === bd.o) return;
+      bd.o = key;
+      const n = Math.max(1, bd.words.length);
+      bd.words.forEach((w, k) => {
+        const t = clamp(inP * 1.7 - (k / n) * .7);
+        w.style.opacity = t.toFixed(3);
+        w.style.transform = `translateY(${((1 - t) * .5).toFixed(3)}em)`;
+        w.style.filter = t < 1 ? `blur(${((1 - t) * 10).toFixed(1)}px)` : 'none';
+      });
+      const r = clamp(inP * 1.7 - .7);
+      bd.rest.forEach(c => { c.style.opacity = r.toFixed(3); c.style.transform = `translateY(${((1 - r) * 16).toFixed(1)}px)`; });
+      bd.el.style.opacity = (1 - outP).toFixed(3);
+      bd.el.style.transform = `translateY(calc(-50% - ${(outP * 40).toFixed(1)}px))`;
+      bd.el.style.filter = outP > 0 ? `blur(${(outP * 8).toFixed(1)}px)` : 'none';
+      const vis = inP > .5 && outP < .5;
+      bd.el.setAttribute('aria-hidden', vis ? 'false' : 'true');
     });
   }
 
@@ -250,7 +301,7 @@
     if (!filmReady || staticHero) { last = { hp, rp }; return; }
     // film: most of the shot in the hero, the rest spread over the page
     const f = hp < 1 ? hp * HERO_SHARE : HERO_SHARE + rp * (1 - HERO_SHARE);
-    drawFrame(Math.round(f * (FILM.n - 1)));
+    drawFrame(f * (FILM.n - 1));
     if (force || rp !== last.rp || hp !== last.hp) {
       // the scene dims behind reading sections and opens up again at the final ask
       const into = ramp(hp, .9, 1);
@@ -587,6 +638,84 @@
   }));
 
   renderBench(false);
+
+  /* ---------- Bid day, two ways: the problem made hands-on ---------- */
+  const bd = $('[data-bidday]');
+  if (bd) {
+    const PROFIT = 72000;
+    const ITEMS = [
+      { name: 'Disconnects on the roof plan', sheet: 'E-501', cost: 3400 },
+      { name: 'Home runs from panel LP-2', sheet: 'E-201', cost: 6800 },
+      { name: 'Type B fixtures on a rough scan', sheet: 'E-102', cost: 7900 },
+      { name: 'Feeders to the rooftop units', sheet: 'E-601', cost: 3500 }
+    ];
+    const ICON = { missed: 'i-x', found: 'i-ready', ok: 'i-approved' };
+    const money = v => '$' + Math.round(v).toLocaleString('en-US');
+    const list = $('[data-bd-items]', bd), profitEl = $('[data-bd-profit]', bd);
+    const fill = $('[data-bd-fill]', bd), note = $('[data-bd-note]', bd), all = $('[data-bd-all]', bd);
+    let mode = 'hand', state = ITEMS.map(() => 'missed'), shownProfit = null;
+
+    const tweenProfit = to => {
+      const from = shownProfit == null ? to : shownProfit;
+      shownProfit = to;
+      if (reduced || from === to) { profitEl.textContent = money(to); return; }
+      const t0 = performance.now(), dur = 800;
+      const step = t => {
+        const k = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - k, 3);
+        profitEl.textContent = money(from + (to - from) * e);
+        if (k < 1 && shownProfit === to) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    };
+
+    function draw(flashIdx) {
+      list.textContent = '';
+      ITEMS.forEach((it, i) => {
+        const s = state[i];
+        const li = document.createElement('li');
+        li.className = 'bd-item s-' + s + (i === flashIdx ? ' flash' : '');
+        const label = s === 'missed' ? 'Never counted' : s === 'found' ? `Ready to review · found on ${it.sheet}` : 'Estimator approved';
+        const amt = s === 'missed' ? '\u2212' + money(it.cost) : s === 'ok' ? '+' + money(it.cost) : money(it.cost);
+        li.innerHTML = `<svg class="ico"><use href="#${ICON[s]}"/></svg><span class="nm"></span><span class="amt"></span><span class="st"></span><span class="act"></span>`;
+        $('.nm', li).textContent = it.name;
+        $('.amt', li).textContent = amt;
+        $('.st', li).textContent = label;
+        if (mode === 'bm') {
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.className = s === 'ok' ? 'mini quiet' : 'mini primary';
+          b.textContent = s === 'ok' ? 'Undo' : 'Approve';
+          b.onclick = () => { state[i] = s === 'ok' ? 'found' : 'ok'; draw(i); };
+          $('.act', li).appendChild(b);
+        }
+        list.appendChild(li);
+      });
+      const lost = ITEMS.reduce((sum, it, i) => sum + (state[i] === 'ok' ? 0 : it.cost), 0);
+      const profit = PROFIT - lost;
+      tweenProfit(profit);
+      fill.style.width = (profit / PROFIT * 100).toFixed(1) + '%';
+      const full = lost === 0;
+      bd.classList.toggle('is-full', full);
+      bd.classList.toggle('is-bm', mode === 'bm');
+      const waiting = state.filter(x => x === 'found').length;
+      if (mode === 'hand') {
+        note.innerHTML = `<strong class="bad">${money(lost)}</strong> of work never made it into the bid. Nobody knew until the job was underway. <strong>Now flip the switch to With BidMate.</strong>`;
+      } else if (full) {
+        note.innerHTML = `<strong class="good">Every item caught and approved.</strong> The full ${money(PROFIT)} margin is protected.`;
+      } else {
+        note.innerHTML = `BidMate found all four. <strong>${waiting} still need${waiting === 1 ? 's' : ''} your approval</strong>. Nothing counts until you approve it.`;
+      }
+      all.hidden = mode !== 'bm' || full;
+    }
+    $$('[data-mode]', bd).forEach(b => b.addEventListener('click', () => {
+      mode = b.dataset.mode;
+      $$('[data-mode]', bd).forEach(x => x.setAttribute('aria-pressed', x === b ? 'true' : 'false'));
+      state = ITEMS.map(() => (mode === 'hand' ? 'missed' : 'found'));
+      draw();
+    }));
+    all.addEventListener('click', () => { state = ITEMS.map(() => 'ok'); draw(); });
+    draw();
+  }
 
   /* ---------- Demo form (no backend yet: shows its thank-you state) ---------- */
   const form = $('[data-form]');
