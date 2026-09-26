@@ -347,8 +347,9 @@
               <li><svg><use href="#i-approved"/></svg>No commitment afterward</li>
             </ul>
           </div>
-          <!-- Paste the Formspree form link (https://formspree.io/f/xxxxxxx) into data-endpoint to send requests to your inbox. Empty = demo mode. -->
-          <form class="form" data-form data-endpoint="" novalidate data-reveal>
+          <!-- Demo requests post to Formspree (form xdekwjey) and arrive in the owner's inbox. Empty data-endpoint = demo mode. -->
+          <form class="form" data-form data-endpoint="https://formspree.io/f/xdekwjey" novalidate data-reveal>
+            <input type="hidden" name="_subject" value="New BidMate demo request">
             <div class="form-fields">
               <label>Your name<input name="name" autocomplete="name" required></label>
               <label>Company<input name="company" autocomplete="organization" required></label>

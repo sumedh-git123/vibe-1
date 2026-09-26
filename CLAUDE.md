@@ -25,9 +25,9 @@ Progress through the skill:
   - Problem section: "Six cents on the dollar. One missed count takes it." (second line red) and a bolded lede. The Today/With BidMate lists were replaced by the **bid-day widget** (`[data-bidday]`): a Counted by hand / With BidMate switch, four example missed items ($21,600 on a $1.2M job with a $72,000 profit), per-item Approve/Undo, Approve all, and an animated profit number and bar. Labeled as example numbers.
 - Private preview artifact: https://claude.ai/artifact/2aaLn4AfMSdZ6oWnqAqWCq (built from `site/` with the html/head/body wrapper stripped).
 
-**Decided:** the demo form goes to the user's email through **Formspree**. Paste their form link into `data-endpoint` on the `<form>` in `site/index.html`; empty means demo mode, which shows a thank-you and sends nothing. No AI-imagery note in the footer. The user said **not yet** to going live and wants to keep polishing.
+**Decided:** the demo form posts to **Formspree form `xdekwjey`** (`data-endpoint="https://formspree.io/f/xdekwjey"` on the `<form>` in `site/index.html`, plus a hidden `_subject`). Tested with mocked responses: a 200 shows the thank-you, and a failure shows a retry message. No real submission has been sent from here. The artifact preview build blanks `data-endpoint` (the artifact sandbox blocks outside requests), so the preview form is demo-only. No AI-imagery note in the footer. The user said **not yet** to going live and wants to keep polishing.
 
-**Open before launch (Phase 10):** the user's Formspree form link, the real domain (og:url/og:image still point at example.com), and connecting Hostinger (not connected; no Hostinger tools yet).
+**Open before launch (Phase 10):** one real test submission once the site is live (Formspree asks to confirm the first one by email), the real domain (og:url/og:image still point at example.com), and connecting Hostinger (not connected; no Hostinger tools yet).
 
 ## Commands
 
