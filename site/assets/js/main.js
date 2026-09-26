@@ -163,7 +163,7 @@
   const bands = $$('[data-band]').map(b => ({ el: b, a: +b.dataset.in, b: +b.dataset.out, o: -1 }));
   const root = document.documentElement;
   const staticHero = reduced;
-  const FILM = small ? { dir: 'm', n: 75 } : { dir: 'd', n: 150 };
+  const FILM = small ? { dir: 'm', n: 80 } : { dir: 'd', n: 168 };
   const HERO_SHARE = .64;           // share of the shot played inside the hero
   const canvas = $('[data-film]'), ctx = canvas.getContext('2d'), veil = $('[data-veil]');
   const frames = new Array(FILM.n);
@@ -173,7 +173,7 @@
   if (staticHero) { root.classList.add('static-hero'); drawPlan(1); }
 
   function sizeCanvas() {
-    const dpr = Math.min(small ? 2 : 1.5, devicePixelRatio || 1);
+    const dpr = Math.min(2, devicePixelRatio || 1);
     cw = Math.round(innerWidth * dpr); ch = Math.round(innerHeight * dpr);
     if (canvas.width !== cw || canvas.height !== ch) { canvas.width = cw; canvas.height = ch; drawnIdx = -1; }
   }
@@ -188,6 +188,8 @@
     const s = Math.max(cw / im.naturalWidth, ch / im.naturalHeight);
     const w = im.naturalWidth * s, h = im.naturalHeight * s;
     const x = (cw - w) * (small ? .62 : .5), y = (ch - h) / 2;   // phones keep the lit circuit in view
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
     ctx.globalAlpha = alpha;
     ctx.drawImage(im, x, y, w, h);
     ctx.globalAlpha = 1;
