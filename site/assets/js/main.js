@@ -705,14 +705,14 @@
       } else if (full) {
         note.innerHTML = `<strong class="good">Every item caught and approved.</strong> The full ${money(PROFIT)} margin is protected.`;
       } else {
-        note.innerHTML = `BidMate found all four. <strong>${waiting} still need${waiting === 1 ? 's' : ''} your approval</strong>. Nothing counts until you approve it.`;
+        note.innerHTML = `<strong>${waiting} line${waiting === 1 ? '' : 's'} back in review.</strong> Nothing counts until you approve it, so that money is out of the total.`;
       }
       all.hidden = mode !== 'bm' || full;
     }
     $$('[data-mode]', bd).forEach(b => b.addEventListener('click', () => {
       mode = b.dataset.mode;
       $$('[data-mode]', bd).forEach(x => x.setAttribute('aria-pressed', x === b ? 'true' : 'false'));
-      state = ITEMS.map(() => (mode === 'hand' ? 'missed' : 'found'));
+      state = ITEMS.map(() => (mode === 'hand' ? 'missed' : 'ok'));   // With BidMate opens fully approved; Undo is there to try
       draw();
     }));
     all.addEventListener('click', () => { state = ITEMS.map(() => 'ok'); draw(); });
