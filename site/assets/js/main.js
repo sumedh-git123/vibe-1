@@ -717,9 +717,11 @@
     draw();
   }
 
-  /* ---------- Demo form (no backend yet: shows its thank-you state) ---------- */
+  /* ---------- Demo form: posts to Formspree when data-endpoint is set ---------- */
   const form = $('[data-form]');
-  form.addEventListener('submit', e => {
+  const errEl = $('[data-form-error]');
+  const errText = errEl.textContent;
+  form.addEventListener('submit', async e => {
     e.preventDefault();
     const req = ['name', 'company', 'email'].map(n => form.elements[n]);
     let ok = true;
@@ -728,8 +730,23 @@
       inp.setAttribute('aria-invalid', bad ? 'true' : 'false');
       if (bad) ok = false;
     });
-    $('[data-form-error]').hidden = ok;
+    errEl.textContent = errText;
+    errEl.hidden = ok;
     if (!ok) { req.find(i => i.getAttribute('aria-invalid') === 'true').focus(); return; }
+    const endpoint = form.dataset.endpoint;
+    if (endpoint) {
+      const btn = $('button[type=submit]', form);
+      btn.disabled = true; btn.textContent = 'Sending';
+      try {
+        const res = await fetch(endpoint, { method: 'POST', body: new FormData(form), headers: { Accept: 'application/json' } });
+        if (!res.ok) throw new Error('send failed');
+      } catch (_) {
+        btn.disabled = false; btn.textContent = 'Book a demo';
+        errEl.textContent = "That didn't send. Check your connection and try again.";
+        errEl.hidden = false;
+        return;
+      }
+    }
     $('.form-fields', form).hidden = true;
     const done = $('[data-form-done]');
     done.hidden = false;
