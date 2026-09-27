@@ -305,7 +305,7 @@
     if (force || rp !== last.rp || vp !== last.vp) {
       // night to paper after the hero; a little of the film returns at the final ask
       const e = vp * vp * (3 - 2 * vp);
-      const v = filmReady ? e * (.975 - ramp(rp, .86, 1) * .06) : e;
+      const v = filmReady ? e * (.88 - ramp(rp, .86, 1) * .1) : e;
       veil.style.opacity = v.toFixed(3);
     }
     if (filmReady && !staticHero) {
