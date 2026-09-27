@@ -43,8 +43,8 @@
     </a>
     <nav class="nav-links" aria-label="Main">
       <a href="#how">How it works</a>
-      <a href="#try">Try the review</a>
-      <a href="#labels">Labels</a>
+      <a href="#try">Try it</a>
+      <a href="#features">What you get</a>
       <a href="#faq">Questions</a>
     </nav>
     <a class="btn btn-small" href="#demo">Book a demo</a>
@@ -69,7 +69,15 @@
             <p class="eyebrow">Division 26 electrical takeoff</p>
             <h1>Bid more jobs.<br>Count none of them by hand.</h1>
             <p class="band-sub">BidMate reads your drawing set and builds the Division 26 takeoff. You check every line against the drawing and approve it.</p>
-            <p class="scroll-cue"><span></span>Scroll</p>
+            <div class="cta-row">
+              <a class="btn" href="#demo">Book a demo</a>
+              <a class="btn btn-ghost" href="#try">Try it now</a>
+            </div>
+            <ul class="hero-proof">
+              <li><svg><use href="#i-approved"/></svg>Every count linked to its sheet</li>
+              <li><svg><use href="#i-approved"/></svg>Nothing counted without your approval</li>
+              <li><svg><use href="#i-approved"/></svg>Rough scans flagged, never guessed</li>
+            </ul>
           </div>
           <div class="band" data-band data-in="0.26" data-out="0.46">
             <p class="band-num">01</p>
@@ -98,7 +106,7 @@
         <div class="wrap">
           <p class="eyebrow" data-reveal>The problem</p>
           <h2 class="display" data-reveal="mask">Six cents on the dollar.<br><span class="hl-bad">One missed count takes it.</span></h2>
-          <p class="lede" data-reveal>Electrical work is bid on <strong>razor-thin margins</strong>. Most of an estimator's week goes into <strong>counting symbols by hand</strong>. One missed disconnect or a few uncounted circuits can <strong class="bad">wipe out the profit on a job</strong>.</p>
+          <p class="lede" data-reveal>Electrical work is bid on <strong>razor-thin margins</strong>. One missed disconnect can <strong class="bad">wipe out the profit on a job</strong>.</p>
 
           <div class="stats">
             <figure class="stat" data-reveal>
@@ -232,74 +240,52 @@
         </div>
       </section>
 
-      <!-- LABELS -->
-      <section class="section labels" id="labels" data-node>
+      <!-- WHAT YOU GET -->
+      <section class="section features" id="features" data-node>
         <div class="wrap">
-          <p class="eyebrow" data-reveal>One set of labels</p>
-          <h2 class="display" data-reveal="mask">Every screen speaks the same three words.</h2>
-          <p class="lede" data-reveal>Each label has its own shape, its own word and its own color. It reads the same on a monitor, a phone or a gray printout.</p>
-          <div class="label-cards">
-            <article class="label-card s-ready" data-reveal>
-              <svg class="label-icon"><use href="#i-ready"/></svg>
-              <h3>Ready to review</h3>
-              <p>The evidence is there. It needs your eyes before it counts.</p>
+          <p class="eyebrow" data-reveal>What you get</p>
+          <h2 class="display" data-reveal="mask">Built for the way estimators check.</h2>
+          <div class="feat-grid">
+            <article class="feat" data-reveal>
+              <svg class="feat-ico" aria-hidden="true"><use href="#i-fixture"/></svg>
+              <h3>Every count shows its evidence.</h3>
+              <p>Click any quantity and land on the exact spot on the sheet where it was found.</p>
             </article>
-            <article class="label-card s-missing" data-reveal>
-              <svg class="label-icon"><use href="#i-missing"/></svg>
-              <h3>Missing information</h3>
-              <p>Something the count depends on is absent, like a scale or a legend. The takeoff can't finish until it's fixed. No override.</p>
+            <article class="feat" data-reveal>
+              <svg class="feat-ico good" aria-hidden="true"><use href="#i-approved"/></svg>
+              <h3>Nothing counts until you approve it.</h3>
+              <p>Your total only includes lines a person has checked. The number you submit is yours.</p>
             </article>
-            <article class="label-card s-approved" data-reveal>
-              <svg class="label-icon"><use href="#i-approved"/></svg>
-              <h3>Estimator approved</h3>
-              <p>A person checked it. Only these lines reach your total.</p>
+            <article class="feat" data-reveal>
+              <svg class="feat-ico warn" aria-hidden="true"><use href="#i-missing"/></svg>
+              <h3>Gaps get flagged, not guessed.</h3>
+              <p>A missing scale or legend blocks the finish until someone fixes it. There is no override.</p>
             </article>
-          </div>
-        </div>
-      </section>
-
-      <!-- WARNINGS -->
-      <section class="section warn" data-node>
-        <div class="wrap split">
-          <div>
-            <p class="eyebrow" data-reveal>Warnings that help</p>
-            <h2 class="display" data-reveal="mask">When something is off, it tells you four things.</h2>
-            <p class="lede" data-reveal>No vague alerts. Every warning says what was found, why it matters, what to check and where to look.</p>
-          </div>
-          <article class="warn-card" data-reveal>
-            <header><svg><use href="#i-missing"/></svg><span>Missing information</span></header>
-            <h3>Scale missing on E-201</h3>
-            <dl>
-              <div><dt>What we found</dt><dd>Sheet E-201 has no drawing scale.</dd></div>
-              <div><dt>Why it matters</dt><dd>Conduit lengths on this sheet can't be measured, so that footage stays out of your total.</dd></div>
-              <div><dt>What to check</dt><dd>Confirm the scale in the title block, or ask the architect.</dd></div>
-              <div><dt>Where it is</dt><dd>Sheet E-201, title block, lower right.</dd></div>
-            </dl>
-          </article>
-        </div>
-      </section>
-
-      <!-- PRINCIPLES -->
-      <section class="section rules" data-node>
-        <div class="wrap">
-          <p class="eyebrow" data-reveal>Built the way you check</p>
-          <h2 class="display" data-reveal="mask">Rules it never bends.</h2>
-          <div class="rule-grid">
-            <div class="rule" data-reveal>
-              <svg viewBox="0 0 60 40" aria-hidden="true"><rect x="4" y="6" width="52" height="28" rx="3"/><path d="M14 20h32" class="cu"/></svg>
+            <article class="feat" data-reveal>
+              <svg class="feat-ico" aria-hidden="true" viewBox="0 0 34 34"><circle cx="7" cy="17" r="5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M17 11.5 22.5 21h-11Z" fill="none" stroke="var(--missing)" stroke-width="2" stroke-linejoin="round"/><circle cx="28" cy="17" r="5" fill="var(--good)"/></svg>
+              <h3>Three labels on every screen.</h3>
+              <ul class="feat-chips">
+                <li class="s-ready"><svg><use href="#i-ready"/></svg>Ready to review</li>
+                <li class="s-missing"><svg><use href="#i-missing"/></svg>Missing information</li>
+                <li class="s-approved"><svg><use href="#i-approved"/></svg>Estimator approved</li>
+              </ul>
+              <p>Shape, word and color, so status reads the same on a gray printout.</p>
+            </article>
+            <article class="feat" data-reveal>
+              <svg class="feat-ico" aria-hidden="true" viewBox="0 0 34 34"><path d="M6 8h22M6 14h22M6 20h22M6 26h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="27" cy="26" r="3" fill="var(--missing)"/></svg>
+              <h3>Warnings that tell you what to do.</h3>
+              <ol class="feat-steps">
+                <li>What was found</li>
+                <li>Why it matters</li>
+                <li>What to check</li>
+                <li>Where it is on the sheet</li>
+              </ol>
+            </article>
+            <article class="feat" data-reveal>
+              <svg class="feat-ico" aria-hidden="true" viewBox="0 0 60 40"><rect x="4" y="6" width="52" height="28" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M14 20h32" stroke="var(--copper)" stroke-width="2.6" stroke-linecap="round"/></svg>
               <h3>Hiding a layer never changes the count.</h3>
-              <p>Clear the clutter off the drawing. The number you're about to bid stays exactly where it was.</p>
-            </div>
-            <div class="rule" data-reveal>
-              <svg viewBox="0 0 60 40" aria-hidden="true"><path d="M30 5 55 35H5Z"/><path d="M30 16v8" class="cu"/></svg>
-              <h3>Gaps block the finish.</h3>
-              <p>If a scale or legend is missing, the takeoff stays open until someone fixes it. There's no button to skip it.</p>
-            </div>
-            <div class="rule" data-reveal>
-              <svg viewBox="0 0 60 40" aria-hidden="true"><path d="M6 30h48" class="cu dash"/><path d="M6 24v12M54 24v12"/></svg>
-              <h3>Unchecked lengths are drawn dashed.</h3>
-              <p>A measurement nobody has verified looks different on the sheet, so you never mistake it for a confirmed one.</p>
-            </div>
+              <p>Clear the clutter off the drawing. The number you are about to bid stays put.</p>
+            </article>
           </div>
         </div>
       </section>
