@@ -164,6 +164,11 @@ strong.good, .hl-good { color: var(--good); }
 .band h2 { font-size: clamp(48px, 6.6vw, 108px); margin-bottom: 30px; text-shadow: 0 2px 30px rgba(var(--night),.8); }
 .band-line { font: 650 clamp(34px, 4.3vw, 64px)/1.08 var(--f-display); font-stretch: 112%; text-wrap: balance; text-shadow: 0 2px 24px rgba(var(--night),.9); }
 .band-num { color: var(--copper); }
+.chapters { position: absolute; right: var(--gutter); top: 50%; transform: translateY(-50%); z-index: 3; display: grid; gap: 14px; }
+.chapters button { width: 10px; height: 10px; padding: 0; border-radius: 999px; border: 1.5px solid var(--copper); background: transparent; cursor: pointer; transition: transform .4s var(--ease), background .4s; }
+.chapters button.on { background: var(--copper); transform: scale(1.35); }
+.chapters button:focus-visible { outline: 2px solid var(--copper); outline-offset: 4px; }
+.static-hero .chapters { display: none; }
 .band-settle, .band-1 { pointer-events: auto; }
 .band[aria-hidden="true"] { pointer-events: none; }
 .band-1 .cta-row { margin-top: 30px; }
