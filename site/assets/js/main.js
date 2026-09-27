@@ -163,7 +163,7 @@
   const bands = $$('[data-band]').map(b => ({ el: b, a: +b.dataset.in, b: +b.dataset.out, o: -1 }));
   const root = document.documentElement;
   const staticHero = reduced;
-  const FILM = small ? { dir: 'm', n: 80 } : { dir: 'd', n: 168 };
+  const FILM = small ? { dir: 'm', n: 53 } : { dir: 'd', n: 79 };
   const HERO_SHARE = .64;           // share of the shot played inside the hero
   const canvas = $('[data-film]'), ctx = canvas.getContext('2d'), veil = $('[data-veil]');
   const frames = new Array(FILM.n);
