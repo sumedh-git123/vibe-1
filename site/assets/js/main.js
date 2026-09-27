@@ -292,32 +292,37 @@
     const y = scrollY;
     const hp = clamp(y / heroSpan);
     const rp = clamp((y - heroSpan) / (pageSpan - heroSpan));
-    return { y, hp, rp };
+    // night to paper: begins as the hero releases, done within most of one screen
+    const vp = clamp((y - heroSpan + innerHeight * .15) / (innerHeight * .75));
+    return { y, hp, rp, vp };
   }
   let target = scene(), shown = { ...target }, running = false, last = {};
   const lerp = (a, b, t) => a + (b - a) * t;
 
   function render(force) {
-    const { hp, rp } = shown;
+    const { hp, rp, vp } = shown;
     if (force || hp !== last.hp) { renderBands(hp); if (!filmReady) drawPlan(hp); }
-    if (!filmReady || staticHero) { last = { hp, rp }; return; }
-    // film: most of the shot in the hero, the rest spread over the page
-    const f = hp < 1 ? hp * HERO_SHARE : HERO_SHARE + rp * (1 - HERO_SHARE);
-    drawFrame(f * (FILM.n - 1));
-    if (force || rp !== last.rp || hp !== last.hp) {
-      // the scene dims behind reading sections and opens up again at the final ask
-      const into = ramp(hp, .9, 1);
-      const v = hp < 1 ? into * .5 : lerp(.5, .66, ramp(rp, 0, .12)) - ramp(rp, .84, 1) * .26;
+    if (force || rp !== last.rp || vp !== last.vp) {
+      // night to paper after the hero; a little of the film returns at the final ask
+      const e = vp * vp * (3 - 2 * vp);
+      const v = filmReady ? e * (.975 - ramp(rp, .86, 1) * .06) : e;
       veil.style.opacity = v.toFixed(3);
-      const sc = 1 + rp * .22, tx = -rp * 4, ty = rp * 3;
-      canvas.style.transform = `translate3d(${tx.toFixed(2)}%, ${ty.toFixed(2)}%, 0) scale(${sc.toFixed(4)})`;
     }
-    last = { hp, rp };
+    if (filmReady && !staticHero) {
+      // film: most of the shot in the hero, the rest spread over the page
+      const f = hp < 1 ? hp * HERO_SHARE : HERO_SHARE + rp * (1 - HERO_SHARE);
+      drawFrame(f * (FILM.n - 1));
+      if (force || rp !== last.rp) {
+        const sc = 1 + rp * .22, tx = -rp * 4, ty = rp * 3;
+        canvas.style.transform = `translate3d(${tx.toFixed(2)}%, ${ty.toFixed(2)}%, 0) scale(${sc.toFixed(4)})`;
+      }
+    }
+    last = { hp, rp, vp };
   }
   function tick() {
     const k = reduced ? 1 : .14;
     let settled = true;
-    for (const key of ['hp', 'rp']) {
+    for (const key of ['hp', 'rp', 'vp']) {
       const d = target[key] - shown[key];
       if (Math.abs(d) < .0004) shown[key] = target[key]; else { shown[key] += d * k; settled = false; }
     }
@@ -396,7 +401,7 @@
       const eb = $('.eyebrow', sec) || sec;
       const y = eb.getBoundingClientRect().top - rr.top + 7;
       d += `V${y}h14m-14 0`;
-      const c = el('circle', { cx: x, cy: y, r: 4.5, fill: '#0E1A26', stroke: '#D9955A', 'stroke-width': 1.5, opacity: .35 }, thread);
+      const c = el('circle', { cx: x, cy: y, r: 4.5, fill: '#F6F1E7', stroke: '#1D5BD8', 'stroke-width': 1.5, opacity: .35 }, thread);
       return { y, c, on: false };
     });
     d += `V${rest.offsetHeight - 40}`;
@@ -410,7 +415,7 @@
     tpath.style.strokeDashoffset = 1 - clamp(reach / rest.offsetHeight);
     nodes.forEach(n => {
       const on = reach >= n.y;
-      if (on !== n.on) { n.on = on; n.c.setAttribute('opacity', on ? 1 : .35); n.c.setAttribute('fill', on ? '#D9955A' : '#0E1A26'); }
+      if (on !== n.on) { n.on = on; n.c.setAttribute('opacity', on ? 1 : .35); n.c.setAttribute('fill', on ? '#1D5BD8' : '#F6F1E7'); }
     });
   }
   addEventListener('scroll', onThread, { passive: true });
@@ -441,7 +446,7 @@
         if (d.y < -4) { d.y = h + 4; d.x = Math.random() * w; }
         if (d.x < -4) d.x = w + 4; else if (d.x > w + 4) d.x = -4;
         ctx.globalAlpha = d.a;
-        ctx.fillStyle = d.warm ? '#D9955A' : '#9CC6DD';
+        ctx.fillStyle = d.warm ? '#1D5BD8' : '#7F9CC4';
         ctx.beginPath(); ctx.arc(d.x, d.y, d.r, 0, 6.283); ctx.fill();
       });
       requestAnimationFrame(frame);
@@ -484,7 +489,7 @@
   const hiddenLayers = new Set();
   const sheet = $('[data-sheet]'), list = $('[data-lines]'), warnBox = $('[data-warning]');
   const note = $('[data-layer-note]');
-  const colorOf = s => ({ ready: '#7FB3CF', missing: '#E6B24C', approved: '#7CC49A' })[s];
+  const colorOf = s => ({ ready: '#2A6FDB', missing: '#C98A12', approved: '#1E9A68' })[s];
 
   function drawSheet() {
     sheet.textContent = '';
@@ -506,7 +511,7 @@
           el('path', { d: `M${x} ${y - 3}v4`, stroke: c, 'stroke-width': 2, 'stroke-linecap': 'round' }, g);
         } else if (it.status === 'approved') {
           el('circle', { cx: x, cy: y, r: 10, fill: c }, g);
-          el('path', { d: `M${x - 4.5} ${y}l3 3 6-6.5`, fill: 'none', stroke: '#0E1A26', 'stroke-width': 2.2, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, g);
+          el('path', { d: `M${x - 4.5} ${y}l3 3 6-6.5`, fill: 'none', stroke: '#fff', 'stroke-width': 2.2, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, g);
         } else if (it.kind === 'panel') {
           el('rect', { x: x - 12, y: y - 8, width: 24, height: 16, rx: 2, fill: 'none', stroke: c, 'stroke-width': 2 }, g);
         } else {
