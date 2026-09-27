@@ -750,8 +750,58 @@
       }
     }
     $('.form-fields', form).hidden = true;
+    const cal = form.dataset.calendly;
+    if (cal) { openCalendly(cal); return; }
+    showDone();
+  });
+
+  function showDone(title, text) {
     const done = $('[data-form-done]');
+    if (title) $('h3', done).textContent = title;
+    if (text) $('p', done).textContent = text;
     done.hidden = false;
     done.focus();
+  }
+
+  /* Calendly opens in place, prefilled with what the visitor just typed.
+     Calendly then books the slot, creates the Zoom link and emails both sides. */
+  function openCalendly(base) {
+    const f = form.elements;
+    const q = new URLSearchParams({
+      name: f.name.value.trim(),
+      email: f.email.value.trim(),
+      a1: f.company.value.trim(),
+      a2: f.volume.value,
+      hide_gdpr_banner: '1',
+      hide_event_type_details: '1',
+      background_color: '132433',
+      text_color: 'ece5d6',
+      primary_color: 'd9955a'
+    });
+    const url = base + (base.includes('?') ? '&' : '?') + q.toString();
+    const book = $('[data-book]'), holder = $('[data-book-cal]');
+    form.closest('.split').classList.add('is-booking');
+    book.hidden = false;
+    $('[data-book-title]').focus();
+    const fallback = () => {
+      holder.innerHTML = '<p style="padding:24px">The calendar didn\'t load. <a class="btn btn-small" target="_blank" rel="noopener"></a></p>';
+      const a = $('a', holder); a.href = url; a.textContent = 'Open the booking page';
+    };
+    const mount = () => {
+      try { window.Calendly.initInlineWidget({ url, parentElement: holder }); } catch (_) { fallback(); }
+    };
+    if (window.Calendly) return mount();
+    const sc = document.createElement('script');
+    sc.src = 'https://assets.calendly.com/assets/external/widget.js';
+    sc.async = true;
+    sc.onload = mount;
+    sc.onerror = fallback;
+    document.head.appendChild(sc);
+  }
+  addEventListener('message', e => {
+    if (e.origin !== 'https://calendly.com' || !e.data || e.data.event !== 'calendly.event_scheduled') return;
+    $('[data-book]').hidden = true;
+    form.closest('.split').classList.remove('is-booking');
+    showDone("You're booked.", 'Check your inbox for the calendar invite and Zoom link. Bring a set you have already bid.');
   });
 })();

@@ -347,8 +347,8 @@
               <li><svg><use href="#i-approved"/></svg>No commitment afterward</li>
             </ul>
           </div>
-          <!-- Demo requests post to Formspree (form xdekwjey) and arrive in the owner's inbox. Empty data-endpoint = demo mode. -->
-          <form class="form" data-form data-endpoint="https://formspree.io/f/xdekwjey" novalidate data-reveal>
+          <!-- Demo requests post to Formspree (form xdekwjey). Then, if data-calendly holds a Calendly event link, the scheduler opens prefilled so the visitor picks a time. Empty data-calendly = thank-you only. -->
+          <form class="form" data-form data-endpoint="https://formspree.io/f/xdekwjey" data-calendly="" novalidate data-reveal>
             <input type="hidden" name="_subject" value="New BidMate demo request">
             <div class="form-fields">
               <label>Your name<input name="name" autocomplete="name" required></label>
@@ -364,6 +364,14 @@
               </label>
               <p class="form-error" data-form-error hidden>Please fill in your name, company and a work email.</p>
               <button class="btn btn-wide" type="submit">Book a demo</button>
+            </div>
+            <div class="book" data-book hidden>
+              <div class="book-head">
+                <p class="book-step">Step 2 of 2</p>
+                <h3 tabindex="-1" data-book-title>Pick a time that works.</h3>
+                <p>Your details are filled in. The Zoom link arrives by email as soon as you book.</p>
+              </div>
+              <div class="book-cal" data-book-cal></div>
             </div>
             <div class="form-done" data-form-done hidden tabindex="-1">
               <svg><use href="#i-approved"/></svg>
