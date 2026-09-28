@@ -254,19 +254,19 @@
     };
     await Promise.all(Array.from({ length: 6 }, worker));
     clearTimeout(showTimer); loader.hidden = true;
-    // play once, like the video would, then rest on the last frame
-    const replay = $('[data-replay]');
-    const play = () => {
-      const dur = 6500, t0 = performance.now();
-      const step = t => {
-        const k = Math.min(1, (t - t0) / dur);
-        drawFrame(k * (FILM.n - 1));
-        if (k < 1) requestAnimationFrame(step); else replay.hidden = false;
-      };
+    // loop the shot there and back (no jump), only while the first screen is in view
+    const cycle = 13000;
+    let acc = 0, prev = performance.now();
+    const step = t => {
+      const dt = Math.min(100, t - prev); prev = t;
+      if (heroInView()) {
+        acc = (acc + dt) % cycle;
+        const k = acc / (cycle / 2);
+        drawFrame((k <= 1 ? k : 2 - k) * (FILM.n - 1));
+      }
       requestAnimationFrame(step);
     };
-    replay.onclick = () => { replay.hidden = true; play(); };
-    play();
+    requestAnimationFrame(step);
   }
 
   // The background is the same on every section: it never zooms or shifts with scrolling.
@@ -284,40 +284,47 @@
     requestAnimationFrame(() => { veilQueued = false; render(); });
   }, { passive: true });
 
-  /* The clean film plays once when the page opens (muted, no audio track),
-     then rests on its last frame. If the video can't play, the image
-     sequence above plays the same shot instead. */
+  /* The clean film loops on the first screen (muted, no audio track; the file
+     plays forward then backward, so the loop has no jump). It pauses once the
+     visitor scrolls past the first screen. A watchdog checks that the video
+     is really moving; if not, the same shot plays from still frames instead. */
   const vid = $('[data-hero-video]');
+  const heroInView = () => scrollY < innerHeight * .9;
   function startFilm() {
     if (saveData) { vid.remove(); noFilm(); render(); drawPlan(1); return; }
     if (staticHero) { vid.remove(); loadFilm(); return; }   // reduced motion: the finished drawing, no playback
     let settled = false;
     const fallback = () => {
       if (settled) return; settled = true;
+      try { vid.pause(); } catch (_) {}
       vid.remove(); root.classList.remove('has-video'); loadFilm();
     };
-    const ready = () => {
-      if (settled) return; settled = true;
-      filmReady = true; root.classList.add('has-film', 'has-video'); render();
-    };
     const mp4 = vid.canPlayType('video/mp4; codecs="avc1.640033"');
-    vid.muted = true; vid.defaultMuted = true; vid.volume = 0;
+    vid.muted = true; vid.defaultMuted = true; vid.volume = 0; vid.loop = true;
+    vid.setAttribute('autoplay', '');
     vid.src = mp4 ? 'assets/media/film.mp4' : 'assets/media/film.webm';
     vid.addEventListener('error', fallback, { once: true });
-    setTimeout(() => { if (vid.readyState < 2) fallback(); }, 8000);
-    vid.addEventListener('playing', ready, { once: true });
-    // start only once the whole shot can play through, so nobody sees a stall
-    let started = false;
-    const go = () => {
-      if (started) return; started = true;
-      const p = vid.play();
-      if (p && p.catch) p.catch(fallback);
-    };
-    vid.addEventListener('canplaythrough', go, { once: true });
-    setTimeout(() => { if (vid.readyState >= 3) go(); }, 4000);
-    const replay = $('[data-replay]');
-    vid.addEventListener('ended', () => { replay.hidden = false; });
-    replay.onclick = () => { replay.hidden = true; vid.currentTime = 0; const r = vid.play(); if (r && r.catch) r.catch(() => {}); };
+    const tryPlay = () => { const p = vid.play(); if (p && p.catch) p.catch(() => {}); };
+    vid.addEventListener('loadeddata', tryPlay, { once: true });
+    tryPlay();
+    // watchdog: the video must actually be moving within 6 seconds
+    const t0 = vid.currentTime;
+    setTimeout(() => {
+      if (settled) return;
+      if (vid.currentTime > t0 + .2) {
+        settled = true; filmReady = true;
+        root.classList.add('has-film', 'has-video'); render();
+      } else fallback();
+    }, 6000);
+    vid.addEventListener('playing', () => {
+      if (settled) return;
+      filmReady = true; root.classList.add('has-film', 'has-video'); render();
+    }, { once: true });
+    // pause below the first screen, resume back at the top
+    addEventListener('scroll', () => {
+      if (!vid.isConnected) return;
+      if (heroInView()) { if (vid.paused) tryPlay(); } else if (!vid.paused) vid.pause();
+    }, { passive: true });
   }
   addEventListener('resize', () => { if (filmReady && !root.classList.contains('has-video')) { sizeCanvas(); drawnIdx = -1; drawFrame(lastFi); } });
   render();
