@@ -255,18 +255,34 @@
     await Promise.all(Array.from({ length: 6 }, worker));
     clearTimeout(showTimer); loader.hidden = true;
     // play once, like the video would, then rest on the last frame
-    const dur = 6500, t0 = performance.now();
-    const step = t => {
-      const k = Math.min(1, (t - t0) / dur);
-      drawFrame(k * (FILM.n - 1));
-      if (k < 1) requestAnimationFrame(step);
+    const replay = $('[data-replay]');
+    const play = () => {
+      const dur = 6500, t0 = performance.now();
+      const step = t => {
+        const k = Math.min(1, (t - t0) / dur);
+        drawFrame(k * (FILM.n - 1));
+        if (k < 1) requestAnimationFrame(step); else replay.hidden = false;
+      };
+      requestAnimationFrame(step);
     };
-    requestAnimationFrame(step);
+    replay.onclick = () => { replay.hidden = true; play(); };
+    play();
   }
 
   // The background is the same on every section: it never zooms or shifts with scrolling.
-  const VEIL = .6;
-  function render() { veil.style.opacity = filmReady ? VEIL : 1; }
+  // On the first screen the film shows at full strength; over that first
+  // screen of scrolling it eases to a soft backdrop, then never changes again.
+  const VEIL_TOP = .06, VEIL = .6;
+  function render() {
+    if (!filmReady) { veil.style.opacity = 1; return; }
+    const k = clamp(scrollY / (innerHeight * .9)), e = k * k * (3 - 2 * k);
+    veil.style.opacity = (VEIL_TOP + (VEIL - VEIL_TOP) * e).toFixed(3);
+  }
+  let veilQueued = false;
+  addEventListener('scroll', () => {
+    if (veilQueued) return; veilQueued = true;
+    requestAnimationFrame(() => { veilQueued = false; render(); });
+  }, { passive: true });
 
   /* The clean film plays once when the page opens (muted, no audio track),
      then rests on its last frame. If the video can't play, the image
@@ -290,8 +306,18 @@
     vid.addEventListener('error', fallback, { once: true });
     setTimeout(() => { if (vid.readyState < 2) fallback(); }, 8000);
     vid.addEventListener('playing', ready, { once: true });
-    const p = vid.play();
-    if (p && p.catch) p.catch(fallback);
+    // start only once the whole shot can play through, so nobody sees a stall
+    let started = false;
+    const go = () => {
+      if (started) return; started = true;
+      const p = vid.play();
+      if (p && p.catch) p.catch(fallback);
+    };
+    vid.addEventListener('canplaythrough', go, { once: true });
+    setTimeout(() => { if (vid.readyState >= 3) go(); }, 4000);
+    const replay = $('[data-replay]');
+    vid.addEventListener('ended', () => { replay.hidden = false; });
+    replay.onclick = () => { replay.hidden = true; vid.currentTime = 0; const r = vid.play(); if (r && r.catch) r.catch(() => {}); };
   }
   addEventListener('resize', () => { if (filmReady && !root.classList.contains('has-video')) { sizeCanvas(); drawnIdx = -1; drawFrame(lastFi); } });
   render();
