@@ -157,7 +157,7 @@
 
   /* ---------- The film: one image sequence behind the whole site ----------
      Frames are plain images drawn to a fixed canvas, so they work in every
-     browser and on phones. The shot plays at one even speed from the top of the page to the bottom. */
+     browser and on phones. Fallback when the video can't play. */
   const hero = $('[data-hero]');
   const root = document.documentElement;
   const staticHero = reduced;
@@ -193,7 +193,9 @@
   }
   // Float frame position: the two neighbouring frames are cross-blended,
   // so motion stays smooth however slowly the page is scrolled.
+  let lastFi = 0;
   function drawFrame(fi) {
+    lastFi = fi;
     const i0 = Math.floor(fi), i1 = Math.min(FILM.n - 1, i0 + 1), frac = fi - i0;
     const key = i0 + Math.round(frac * 24) / 24;
     if (key === drawnIdx) return;
@@ -224,11 +226,12 @@
     const loader = $('[data-loader]'), bar = $('[data-loader-bar]');
     const showTimer = setTimeout(() => { loader.hidden = false; }, 600);
     await loadFrame(0);
-    if (!frames[0]) { clearTimeout(showTimer); loader.hidden = true; noFilm(); render(true); return; }
+    if (!frames[0]) { clearTimeout(showTimer); loader.hidden = true; noFilm(); render(); return; }
     sizeCanvas();
     filmReady = true;
     root.classList.add('has-film');
-    render(true);
+    render();
+    drawnIdx = -1; drawFrame(0);
     if (staticHero) {                       // reduced motion: rest on the finished frame
       await loadFrame(FILM.n - 1); drawnIdx = -1; drawFrame(FILM.n - 1);
       clearTimeout(showTimer); loader.hidden = true; return;
@@ -247,52 +250,52 @@
         done++;
         if (done <= firstPass) bar.style.strokeDashoffset = 1 - done / firstPass;
         if (done === firstPass) { clearTimeout(showTimer); loader.hidden = true; }
-        drawnIdx = -1; render(true);
       }
     };
     await Promise.all(Array.from({ length: 6 }, worker));
     clearTimeout(showTimer); loader.hidden = true;
+    // play once, like the video would, then rest on the last frame
+    const dur = 6500, t0 = performance.now();
+    const step = t => {
+      const k = Math.min(1, (t - t0) / dur);
+      drawFrame(k * (FILM.n - 1));
+      if (k < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
   }
 
-  // One mapping for the whole page: scroll position -> film position.
-  // Same speed from top to bottom; the background never changes character.
+  // The background is the same on every section: it never zooms or shifts with scrolling.
   const VEIL = .6;
-  function scene() {
-    const span = Math.max(1, document.documentElement.scrollHeight - innerHeight);
-    return { p: clamp(scrollY / span) };
-  }
-  let target = scene(), shown = { ...target }, running = false, last = {};
+  function render() { veil.style.opacity = filmReady ? VEIL : 1; }
 
-  function render(force) {
-    const { p } = shown;
-    if (force) veil.style.opacity = filmReady ? VEIL : 1;
-    if (!filmReady) { if (force || p !== last.p) drawPlan(clamp(p * 4)); last = { p }; return; }
-    if (staticHero) { last = { p }; return; }
-    if (force || p !== last.p) {
-      drawFrame(p * (FILM.n - 1));
-      const sc = 1 + p * .1;
-      canvas.style.transform = `scale(${sc.toFixed(4)})`;
-    }
-    last = { p };
+  /* The clean film plays once when the page opens (muted, no audio track),
+     then rests on its last frame. If the video can't play, the image
+     sequence above plays the same shot instead. */
+  const vid = $('[data-hero-video]');
+  function startFilm() {
+    if (saveData) { vid.remove(); noFilm(); render(); drawPlan(1); return; }
+    if (staticHero) { vid.remove(); loadFilm(); return; }   // reduced motion: the finished drawing, no playback
+    let settled = false;
+    const fallback = () => {
+      if (settled) return; settled = true;
+      vid.remove(); root.classList.remove('has-video'); loadFilm();
+    };
+    const ready = () => {
+      if (settled) return; settled = true;
+      filmReady = true; root.classList.add('has-film', 'has-video'); render();
+    };
+    const mp4 = vid.canPlayType('video/mp4; codecs="avc1.640033"');
+    vid.muted = true; vid.defaultMuted = true; vid.volume = 0;
+    vid.src = mp4 ? 'assets/media/film.mp4' : 'assets/media/film.webm';
+    vid.addEventListener('error', fallback, { once: true });
+    setTimeout(() => { if (vid.readyState < 2) fallback(); }, 8000);
+    vid.addEventListener('playing', ready, { once: true });
+    const p = vid.play();
+    if (p && p.catch) p.catch(fallback);
   }
-  function tick() {
-    const k = reduced ? 1 : .12;
-    let settled = true;
-    for (const key of ['p']) {
-      const d = target[key] - shown[key];
-      if (Math.abs(d) < .0004) shown[key] = target[key]; else { shown[key] += d * k; settled = false; }
-    }
-    render(false);
-    if (!settled) requestAnimationFrame(tick); else running = false;
-  }
-  function onScroll() {
-    target = scene();
-    if (!running) { running = true; requestAnimationFrame(tick); }
-  }
-  addEventListener('scroll', onScroll, { passive: true });
-  addEventListener('resize', () => { sizeCanvas(); onScroll(); render(true); });
-  render(true);
-  if (saveData) noFilm(); else loadFilm();
+  addEventListener('resize', () => { if (filmReady && !root.classList.contains('has-video')) { sizeCanvas(); drawnIdx = -1; drawFrame(lastFi); } });
+  render();
+  startFilm();
 
   /* ---------- Reveals ---------- */
   $$('.step-art .draw > *').forEach(n => n.setAttribute('pathLength', 1));
