@@ -153,18 +153,15 @@
     };
     walk(root);
   }
-  $$('[data-reveal="mask"], .band h1, .band h2, .band-line').forEach(splitWords);
+  $$('[data-reveal="mask"]').forEach(splitWords);
 
   /* ---------- The film: one image sequence behind the whole site ----------
      Frames are plain images drawn to a fixed canvas, so they work in every
-     browser and on phones. The hero plays most of the shot; the rest of the
-     page keeps it moving slowly, so every section sits inside the same scene. */
+     browser and on phones. The shot plays at one even speed from the top of the page to the bottom. */
   const hero = $('[data-hero]');
-  const bands = $$('[data-band]').map(b => ({ el: b, a: +b.dataset.in, b: +b.dataset.out, o: -1 }));
   const root = document.documentElement;
   const staticHero = reduced;
   const FILM = small ? { dir: 'm', n: 53 } : { dir: 'd', n: 79 };
-  const HERO_SHARE = .64;           // share of the shot played inside the hero
   const canvas = $('[data-film]'), ctx = canvas.getContext('2d'), veil = $('[data-veil]');
   const frames = new Array(FILM.n);
   let filmReady = false, drawnIdx = -1, cw = 0, ch = 0;
@@ -257,72 +254,31 @@
     clearTimeout(showTimer); loader.hidden = true;
   }
 
-  bands.forEach(bd => {
-    bd.words = $$('.w', bd.el);
-    bd.rest = Array.from(bd.el.children).filter(c => !c.querySelector('.w') && !c.classList.contains('w'));
-  });
-  function renderBands(p) {
-    bands.forEach(bd => {
-      const inP = bd.a <= 0 ? 1 : ramp(p, bd.a, bd.a + .075);
-      const outP = bd.b > 1 ? 0 : ramp(p, bd.b - .06, bd.b);
-      const key = Math.round(inP * 500) + ':' + Math.round(outP * 500);
-      if (key === bd.o) return;
-      bd.o = key;
-      const n = Math.max(1, bd.words.length);
-      bd.words.forEach((w, k) => {
-        const t = clamp(inP * 1.7 - (k / n) * .7);
-        w.style.opacity = t.toFixed(3);
-        w.style.transform = `translateY(${((1 - t) * .5).toFixed(3)}em)`;
-        w.style.filter = t < 1 ? `blur(${((1 - t) * 10).toFixed(1)}px)` : 'none';
-      });
-      const r = clamp(inP * 1.7 - .7);
-      bd.rest.forEach(c => { c.style.opacity = r.toFixed(3); c.style.transform = `translateY(${((1 - r) * 16).toFixed(1)}px)`; });
-      bd.el.style.opacity = (1 - outP).toFixed(3);
-      bd.el.style.transform = `translateY(calc(-50% - ${(outP * 40).toFixed(1)}px))`;
-      bd.el.style.filter = outP > 0 ? `blur(${(outP * 8).toFixed(1)}px)` : 'none';
-      const vis = inP > .5 && outP < .5;
-      bd.el.setAttribute('aria-hidden', vis ? 'false' : 'true');
-    });
-  }
-
-  // Scroll position mapped to: hero progress, film position, veil and camera drift
+  // One mapping for the whole page: scroll position -> film position.
+  // Same speed from top to bottom; the background never changes character.
+  const VEIL = .6;
   function scene() {
-    const heroSpan = Math.max(1, hero.offsetHeight - innerHeight);
-    const pageSpan = Math.max(heroSpan + 1, document.documentElement.scrollHeight - innerHeight);
-    const y = scrollY;
-    const hp = clamp(y / heroSpan);
-    const rp = clamp((y - heroSpan) / (pageSpan - heroSpan));
-    // night to paper: begins as the hero releases, done within most of one screen
-    const vp = clamp((y - heroSpan + innerHeight * .15) / (innerHeight * .75));
-    return { y, hp, rp, vp };
+    const span = Math.max(1, document.documentElement.scrollHeight - innerHeight);
+    return { p: clamp(scrollY / span) };
   }
   let target = scene(), shown = { ...target }, running = false, last = {};
-  const lerp = (a, b, t) => a + (b - a) * t;
 
   function render(force) {
-    const { hp, rp, vp } = shown;
-    if (force || hp !== last.hp) { renderBands(hp); if (!filmReady) drawPlan(hp); }
-    if (force || rp !== last.rp || vp !== last.vp) {
-      // night to paper after the hero; a little of the film returns at the final ask
-      const e = vp * vp * (3 - 2 * vp);
-      const v = filmReady ? e * (.88 - ramp(rp, .86, 1) * .1) : e;
-      veil.style.opacity = v.toFixed(3);
+    const { p } = shown;
+    if (force) veil.style.opacity = filmReady ? VEIL : 1;
+    if (!filmReady) { if (force || p !== last.p) drawPlan(clamp(p * 4)); last = { p }; return; }
+    if (staticHero) { last = { p }; return; }
+    if (force || p !== last.p) {
+      drawFrame(p * (FILM.n - 1));
+      const sc = 1 + p * .1;
+      canvas.style.transform = `scale(${sc.toFixed(4)})`;
     }
-    if (filmReady && !staticHero) {
-      // film: most of the shot in the hero, the rest spread over the page
-      const f = hp < 1 ? hp * HERO_SHARE : HERO_SHARE + rp * (1 - HERO_SHARE);
-      drawFrame(f * (FILM.n - 1));
-      if (force || rp !== last.rp) {
-        const sc = 1 + rp * .22, tx = -rp * 4, ty = rp * 3;
-        canvas.style.transform = `translate3d(${tx.toFixed(2)}%, ${ty.toFixed(2)}%, 0) scale(${sc.toFixed(4)})`;
-      }
-    }
-    last = { hp, rp, vp };
+    last = { p };
   }
   function tick() {
-    const k = reduced ? 1 : .14;
+    const k = reduced ? 1 : .12;
     let settled = true;
-    for (const key of ['hp', 'rp', 'vp']) {
+    for (const key of ['p']) {
       const d = target[key] - shown[key];
       if (Math.abs(d) < .0004) shown[key] = target[key]; else { shown[key] += d * k; settled = false; }
     }
@@ -335,102 +291,6 @@
   }
   addEventListener('scroll', onScroll, { passive: true });
   addEventListener('resize', () => { sizeCanvas(); onScroll(); render(true); });
-
-  /* ---------- One flick, one chapter ----------
-     Inside the hero, a single wheel flick, swipe or key press glides to the
-     next chapter and the film plays that stretch by itself. The last flick
-     lands on the problem section; below that the page scrolls normally. */
-  const CH = [0, .36, .63, 1];                       // hero progress for each chapter
-  const firstSection = $('.problem');
-  const dots = $$('[data-ch]');
-  let gliding = false, lockUntil = 0, lastWheel = 0, lastMag = 0;
-  const heroSpanPx = () => Math.max(1, hero.offsetHeight - innerHeight);
-  const stops = () => {
-    const hs = heroSpanPx();
-    return CH.map(c => Math.round(c * hs)).concat(Math.round(firstSection.getBoundingClientRect().top + scrollY));
-  };
-  const currentStop = st => {
-    let best = 0;
-    st.forEach((y, i) => { if (Math.abs(scrollY - y) < Math.abs(scrollY - st[best])) best = i; });
-    return best;
-  };
-  function glideTo(y) {
-    const from = scrollY, dist = y - from;
-    if (Math.abs(dist) < 2) return;
-    gliding = true;
-    const dur = Math.min(1400, 700 + Math.abs(dist) * .25), t0 = performance.now();
-    const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-    const step = now => {
-      const k = Math.min(1, (now - t0) / dur);
-      window.scrollTo({ top: from + dist * ease(k), behavior: 'instant' });
-      if (k < 1) requestAnimationFrame(step);
-      else { gliding = false; lockUntil = performance.now() + 450; }
-    };
-    requestAnimationFrame(step);
-  }
-  const inSnapZone = st => scrollY <= st[st.length - 1] + 4;
-  function go(dir) {
-    const st = stops();
-    const target = dir > 0 ? st.find(y => y > scrollY + 4) : [...st].reverse().find(y => y < scrollY - 4);
-    if (target != null) glideTo(target);
-  }
-  function markDots() {
-    const st = stops(), i = currentStop(st);
-    dots.forEach((d, k) => d.classList.toggle('on', k === Math.min(i, 3)));
-  }
-  addEventListener('scroll', markDots, { passive: true });
-  markDots();
-  dots.forEach(d => d.addEventListener('click', () => glideTo(stops()[+d.dataset.ch])));
-
-  if (!reduced) {
-    addEventListener('wheel', e => {
-      if (e.ctrlKey) return;                               // pinch zoom
-      const st = stops();
-      const dir = Math.sign(e.deltaY);
-      if (!dir) return;
-      const atBoundaryUp = dir < 0 && scrollY <= st[st.length - 1] + 4;
-      if (!(inSnapZone(st) && (dir > 0 ? scrollY < st[st.length - 1] - 4 : atBoundaryUp))) return;
-      e.preventDefault();
-      // A new flick is a wheel event after a pause, or one clearly stronger than
-      // the fading momentum before it. Momentum from the last flick never counts.
-      const now = performance.now(), mag = Math.abs(e.deltaY);
-      const fresh = now - lastWheel > 220 || mag > lastMag * 1.8 + 8;
-      lastWheel = now; lastMag = mag;
-      if (gliding || now < lockUntil || !fresh || mag < 4) return;
-      go(dir);
-    }, { passive: false });
-
-    let ty = null, tx = 0;
-    addEventListener('touchstart', e => { ty = e.touches[0].clientY; tx = e.touches[0].clientX; }, { passive: true });
-    addEventListener('touchmove', e => {
-      if (ty == null) return;
-      const st = stops(), dy = ty - e.touches[0].clientY;
-      const dir = Math.sign(dy);
-      if (!dir || !inSnapZone(st)) return;
-      if (dir > 0 && scrollY >= st[st.length - 1] - 4) return;
-      e.preventDefault();
-    }, { passive: false });
-    addEventListener('touchend', e => {
-      if (ty == null) return;
-      const dy = ty - e.changedTouches[0].clientY, dx = tx - e.changedTouches[0].clientX;
-      ty = null;
-      const st = stops();
-      if (Math.abs(dy) < 30 || Math.abs(dx) > Math.abs(dy) || !inSnapZone(st) || gliding) return;
-      const dir = Math.sign(dy);
-      if (dir > 0 && scrollY >= st[st.length - 1] - 4) return;
-      go(dir);
-    }, { passive: true });
-
-    addEventListener('keydown', e => {
-      if (e.target.closest('input, select, textarea, button, a') && e.key === ' ') return;
-      const down = ['ArrowDown', 'PageDown', ' '].includes(e.key), up = ['ArrowUp', 'PageUp'].includes(e.key);
-      if (!down && !up) return;
-      const st = stops();
-      if (!inSnapZone(st) || (down && scrollY >= st[st.length - 1] - 4)) return;
-      e.preventDefault();
-      if (!gliding) go(down ? 1 : -1);
-    });
-  }
   render(true);
   if (saveData) noFilm(); else loadFilm();
 
