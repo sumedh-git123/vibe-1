@@ -528,3 +528,24 @@ strong.good, .hl-good { color: var(--good); }
 .pain.is-bad h3 { color: var(--bad); }
 @media (max-width: 980px) { .pains { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 600px) { .pains { grid-template-columns: 1fr; } }
+
+/* Hero copy sits on a clear frosted panel, like the cards below */
+.band-1 { padding: 34px 38px 32px; border-radius: 22px; border: 1px solid rgba(29,70,140,.14);
+  background: linear-gradient(180deg, rgba(255,255,255,.72), rgba(255,255,255,.55));
+  -webkit-backdrop-filter: blur(12px) saturate(1.15); backdrop-filter: blur(12px) saturate(1.15);
+  box-shadow: 0 30px 80px -40px rgba(16,35,63,.3); width: min(780px, 60vw); }
+.band-1 h1, .band-1 .band-sub, .hero-proof li { text-shadow: none; }
+.brand-mark { width: 30px; height: 30px; }
+.brand:hover .brand-mark { transform: none; }
+/* Tighter hand-off from the hero into "Sound familiar?" */
+.stage { height: 88vh; height: 88svh; min-height: 640px; }
+.problem { padding-top: clamp(28px, 4vw, 56px); }
+@media (max-width: 980px) { .band-1 { width: auto; left: var(--gutter); right: var(--gutter); padding: 24px 22px; } }
+/* Hero layout that always fits: the panel sits in the flow, clear of the menu, never clipped */
+.stage { display: flex; align-items: center; height: auto; min-height: 88vh; min-height: 88svh; padding: 104px var(--gutter) 48px; }
+.band-1, .static-hero .band-1 { position: relative; top: auto; left: auto; right: auto; transform: none; animation: heroIn2 1.1s var(--ease) both; }
+@keyframes heroIn2 { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
+@media (max-height: 820px) { .band-1 h1 { font-size: clamp(40px, 5vw, 76px); } .band-1 { padding: 26px 32px 24px; } .hero-proof { margin-top: 18px; } .band-1 .cta-row { margin-top: 22px; } }
+@media (max-width: 980px) { .band-1 { width: 100%; } }
+@media (prefers-reduced-motion: reduce) { .band-1 { animation: none; } }
+.hero .bands { position: relative; inset: auto; width: 100%; max-width: var(--maxw); margin: 0 auto; z-index: 2; }
