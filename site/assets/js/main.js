@@ -771,19 +771,17 @@
       a2: f.volume.value,
       hide_gdpr_banner: '1',
       hide_event_type_details: '1',
-      background_color: '132433',
-      text_color: 'ece5d6',
-      primary_color: 'd9955a'
+      background_color: 'f6f1e7',
+      text_color: '10233f',
+      primary_color: '1d5bd8'
     });
     const url = base + (base.includes('?') ? '&' : '?') + q.toString();
     const book = $('[data-book]'), holder = $('[data-book-cal]');
     form.closest('.split').classList.add('is-booking');
     book.hidden = false;
     $('[data-book-title]').focus();
-    const fallback = () => {
-      holder.innerHTML = '<p style="padding:24px">The calendar didn\'t load. <a class="btn btn-small" target="_blank" rel="noopener"></a></p>';
-      const a = $('a', holder); a.href = url; a.textContent = 'Open the booking page';
-    };
+    // If the inline calendar can't load, send them straight to the booking page (same tab).
+    const fallback = () => { location.href = url; };
     const mount = () => {
       try { window.Calendly.initInlineWidget({ url, parentElement: holder }); } catch (_) { fallback(); }
     };
@@ -792,6 +790,7 @@
     sc.src = 'https://assets.calendly.com/assets/external/widget.js';
     sc.async = true;
     sc.onload = mount;
+    setTimeout(() => { if (!window.Calendly) fallback(); }, 8000);
     sc.onerror = fallback;
     document.head.appendChild(sc);
   }
