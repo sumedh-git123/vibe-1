@@ -515,3 +515,16 @@ strong.good, .hl-good { color: var(--good); }
   background: linear-gradient(180deg, rgba(255,255,255,.72), rgba(255,255,255,.5));
   -webkit-backdrop-filter: blur(12px) saturate(1.15); backdrop-filter: blur(12px) saturate(1.15); }
 .stat + .stat, .stat:nth-child(n+3) { border-top: 1px solid rgba(29,70,140,.14); }
+
+/* Problem: pain points in the estimator's own words */
+.pains { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 48px 0 56px; }
+.pain { padding: 30px 28px; border-radius: 18px; border: 1px solid rgba(29,70,140,.14);
+  background: linear-gradient(180deg, rgba(255,255,255,.8), rgba(255,255,255,.6));
+  -webkit-backdrop-filter: blur(12px) saturate(1.15); backdrop-filter: blur(12px) saturate(1.15);
+  display: flex; flex-direction: column; gap: 14px; transition: border-color .4s, transform .5s var(--ease); }
+.pain:hover { border-color: rgba(212,70,47,.45); transform: translateY(-3px); }
+.pain h3 { font-size: clamp(22px, 2vw, 28px); line-height: 1.12; }
+.pain p { margin: 0; color: var(--paper-dim); font-size: 16px; }
+.pain.is-bad h3 { color: var(--bad); }
+@media (max-width: 980px) { .pains { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 600px) { .pains { grid-template-columns: 1fr; } }
