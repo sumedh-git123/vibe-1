@@ -417,12 +417,6 @@ strong.good, .hl-good { color: var(--good); }
 .form input:focus, .form select:focus { outline: none; border-color: var(--copper); box-shadow: 0 0 0 3px rgba(29,91,216,0.2); }
 .form input[aria-invalid="true"] { border-color: var(--missing); }
 .form-error { color: var(--missing) !important; font-size: 14px; margin: 0; }
-.book-head { margin-bottom: 14px; }
-.book-step { font: 500 13px var(--f-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--copper) !important; margin: 0 0 8px; }
-.book-head h3 { font-size: 26px; margin-bottom: 8px; outline: none; }
-.book-cal { min-height: 680px; border-radius: 14px; overflow: hidden; background: rgba(16,35,63,0.06); }
-.book-cal .calendly-inline-widget { min-width: 280px; height: 680px; }
-.split.is-booking { grid-template-columns: .8fr 1.2fr; }
 .form-done { text-align: center; padding: 30px 10px; animation: rise .6s var(--ease); outline: none; }
 .form-done svg { width: 44px; height: 44px; color: var(--approved); margin: 0 auto 18px; }
 .form-done h3 { font-size: 28px; margin-bottom: 10px; }
@@ -556,3 +550,18 @@ strong.good, .hl-good { color: var(--good); }
 .problem { padding-top: calc(2 * clamp(80px, 11vw, 140px) - 57px); }
 @media (max-height: 820px), (max-width: 980px) { .problem { padding-top: calc(2 * clamp(80px, 11vw, 140px) - 28px); } }
 @media (max-height: 820px) and (min-width: 981px) { .problem { padding-top: calc(2 * clamp(80px, 11vw, 140px) - 48px); } }
+
+/* Booking modal: Calendly opens over the page, like a popup */
+.cal-modal { position: fixed; inset: 0; z-index: 200; display: flex; align-items: center; justify-content: center; padding: 20px; background: rgba(16,35,63,.5); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); animation: calFade .25s ease; }
+.cal-modal[hidden] { display: none; }
+.cal-card { position: relative; width: min(1000px, 100%); max-height: calc(100svh - 40px); display: flex; flex-direction: column; background: #F6F1E7; border-radius: 22px; box-shadow: 0 40px 120px -30px rgba(16,35,63,.6); padding: 14px 14px 10px; animation: calRise .4s var(--ease); }
+.cal-stage { flex: 1; min-height: 0; overflow: auto; border-radius: 14px; background: #F6F1E7; -webkit-overflow-scrolling: touch; }
+.cal-stage .calendly-inline-widget { min-width: 280px; height: min(680px, calc(100svh - 150px)); }
+.cal-loading { margin: 0; padding: 60px 20px; text-align: center; color: var(--paper-dim); }
+.cal-close { position: absolute; top: -14px; right: -14px; width: 40px; height: 40px; border-radius: 50%; border: 0; background: #fff; color: var(--paper); font-size: 24px; line-height: 1; cursor: pointer; box-shadow: 0 6px 20px rgba(16,35,63,.25); z-index: 2; }
+.cal-alt { margin: 8px 0 2px; text-align: center; font-size: 13px; }
+.cal-alt a { color: var(--copper); }
+.cal-open body { overflow: hidden; }
+@keyframes calFade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes calRise { from { opacity: 0; transform: translateY(18px) scale(.98); } to { opacity: 1; transform: none; } }
+@media (max-width: 640px) { .cal-modal { padding: 10px; } .cal-close { top: 8px; right: 8px; } .cal-card { padding: 8px 8px 6px; } }

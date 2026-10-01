@@ -328,18 +328,11 @@
               <p class="form-error" data-form-error hidden>Please fill in your name, company and a work email.</p>
               <button class="btn btn-wide" type="submit">Book a demo</button>
             </div>
-            <div class="book" data-book hidden>
-              <div class="book-head">
-                <p class="book-step">Step 2 of 2</p>
-                <h3 tabindex="-1" data-book-title>Pick a time that works.</h3>
-                <p>Your details are filled in. The Zoom link arrives by email as soon as you book.</p>
-              </div>
-              <div class="book-cal" data-book-cal></div>
-            </div>
             <div class="form-done" data-form-done hidden tabindex="-1">
               <svg><use href="#i-approved"/></svg>
               <h3>Request received.</h3>
-              <p>Thanks. We'll email you within one business day to set a time.</p>
+              <p data-done-text>Thanks. We'll email you within one business day to set a time.</p>
+              <button class="btn btn-small" type="button" data-cal-reopen hidden>Choose a time</button>
             </div>
           </form>
         </div>
@@ -354,6 +347,14 @@
       <p class="footer-small">© 2026 BidMate</p>
     </div>
   </footer>
+
+  <div class="cal-modal" data-cal-modal role="dialog" aria-modal="true" aria-label="Book a demo" hidden>
+    <div class="cal-card">
+      <button class="cal-close" type="button" data-cal-close aria-label="Close">&times;</button>
+      <div class="cal-stage" data-book-cal><p class="cal-loading">Loading the calendar&hellip;</p></div>
+      <p class="cal-alt"><a data-cal-alt target="_blank" rel="noopener">Calendar not loading? Open it in a new tab</a></p>
+    </div>
+  </div>
 
   <script src="assets/js/main.js" defer></script>
 </body>

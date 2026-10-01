@@ -760,8 +760,31 @@
     done.focus();
   }
 
-  /* Calendly opens in place, prefilled with what the visitor just typed.
-     Calendly then books the slot, creates the Zoom link and emails both sides. */
+  /* Calendly opens in a modal on this page (the page stays put behind it), prefilled with
+     what the visitor just typed. Calendly then books the slot, creates the Zoom link and
+     emails both sides. Nothing ever navigates away. */
+  const modal = $('[data-cal-modal]'), holder = $('[data-book-cal]');
+  let calUrl = '', lastFocus = null;
+  function closeCal() {
+    modal.hidden = true;
+    document.documentElement.classList.remove('cal-open');
+    if (lastFocus) lastFocus.focus();
+  }
+  function showCal() {
+    lastFocus = document.activeElement;
+    modal.hidden = false;
+    document.documentElement.classList.add('cal-open');
+    $('[data-cal-close]').focus();
+  }
+  $('[data-cal-close]').addEventListener('click', () => { closeCal(); afterClose(); });
+  modal.addEventListener('click', e => { if (e.target === modal) { closeCal(); afterClose(); } });
+  addEventListener('keydown', e => { if (e.key === 'Escape' && !modal.hidden) { closeCal(); afterClose(); } });
+  $('[data-cal-reopen]').addEventListener('click', () => showCal());
+  function afterClose() {
+    // Closed without booking: keep the page friendly and let them reopen the calendar.
+    if ($('[data-form-done]').hidden) showDone('Details received.', 'Pick a time whenever you are ready.');
+    $('[data-cal-reopen]').hidden = false;
+  }
   function openCalendly(base) {
     const f = form.elements;
     const q = new URLSearchParams({
@@ -775,33 +798,24 @@
       text_color: '10233f',
       primary_color: '1d5bd8'
     });
-    const url = base + (base.includes('?') ? '&' : '?') + q.toString();
-    const book = $('[data-book]'), holder = $('[data-book-cal]');
-    form.closest('.split').classList.add('is-booking');
-    book.hidden = false;
-    $('[data-book-title]').focus();
-    // If the inline calendar can't load, send them straight to the booking page (same tab).
-    const fallback = () => {
-      holder.innerHTML = '<div style="padding:32px;text-align:center"><p style="margin:0 0 16px">Opening the booking calendar&hellip;</p><a class="btn" target="_top"></a></div>';
-      const a = $('a', holder); a.href = url; a.textContent = 'Choose a time';
-      setTimeout(() => { try { location.href = url; } catch (_) {} }, 1200);
-    };
+    calUrl = base + (base.includes('?') ? '&' : '?') + q.toString();
+    $('[data-cal-alt]').href = calUrl;
+    showCal();
     const mount = () => {
-      try { window.Calendly.initInlineWidget({ url, parentElement: holder }); } catch (_) { fallback(); }
+      holder.innerHTML = '';
+      try { window.Calendly.initInlineWidget({ url: calUrl, parentElement: holder }); } catch (_) {}
     };
     if (window.Calendly) return mount();
     const sc = document.createElement('script');
     sc.src = 'https://assets.calendly.com/assets/external/widget.js';
     sc.async = true;
     sc.onload = mount;
-    setTimeout(() => { if (!window.Calendly) fallback(); }, 8000);
-    sc.onerror = fallback;
     document.head.appendChild(sc);
   }
   addEventListener('message', e => {
     if (e.origin !== 'https://calendly.com' || !e.data || e.data.event !== 'calendly.event_scheduled') return;
-    $('[data-book]').hidden = true;
-    form.closest('.split').classList.remove('is-booking');
+    closeCal();
+    $('[data-cal-reopen]').hidden = true;
     showDone("You're booked.", 'Check your inbox for the calendar invite and Zoom link. Bring a set you have already bid.');
   });
 })();
