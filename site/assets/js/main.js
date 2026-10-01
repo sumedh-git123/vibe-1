@@ -781,7 +781,11 @@
     book.hidden = false;
     $('[data-book-title]').focus();
     // If the inline calendar can't load, send them straight to the booking page (same tab).
-    const fallback = () => { location.href = url; };
+    const fallback = () => {
+      holder.innerHTML = '<div style="padding:32px;text-align:center"><p style="margin:0 0 16px">Opening the booking calendar&hellip;</p><a class="btn" target="_top"></a></div>';
+      const a = $('a', holder); a.href = url; a.textContent = 'Choose a time';
+      setTimeout(() => { try { location.href = url; } catch (_) {} }, 1200);
+    };
     const mount = () => {
       try { window.Calendly.initInlineWidget({ url, parentElement: holder }); } catch (_) { fallback(); }
     };
