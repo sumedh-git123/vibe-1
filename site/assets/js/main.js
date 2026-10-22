@@ -796,9 +796,9 @@
       a1: f.company.value.trim(),
       a2: f.volume.value,
       hide_gdpr_banner: '1',
-      background_color: 'f6f1e7',
-      text_color: '10233f',
-      primary_color: '1d5bd8'
+      background_color: '141414',
+      text_color: 'ffffff',
+      primary_color: 'ffffff'
     });
     if (!f.name.value.trim()) q.delete('a2');   // untouched form: nothing to prefill
     [...q.keys()].forEach(k => { if (!q.get(k)) q.delete(k); });

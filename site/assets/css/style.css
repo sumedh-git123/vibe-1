@@ -568,3 +568,13 @@ strong.good, .hl-good { color: var(--good); }
 
 .cal-blocked { padding: 70px 20px; text-align: center; }
 .cal-blocked p { margin: 0 0 18px; color: var(--paper-dim); }
+
+/* Booking popup in the dark Cal.com style */
+.cal-modal { background: rgba(8,8,10,.72); }
+.cal-card { background: #0f0f10; border: 1px solid rgba(255,255,255,.08); box-shadow: 0 40px 140px -20px rgba(0,0,0,.8); }
+.cal-stage { background: #141414; border: 1px solid rgba(255,255,255,.08); }
+.cal-stage .calendly-inline-widget { background: #141414; }
+.cal-loading, .cal-blocked p { color: rgba(255,255,255,.7); }
+.cal-alt a { color: rgba(255,255,255,.7); }
+.cal-close { background: #fff; color: #111; }
+.cal-blocked .btn { background: #fff; color: #111; }
