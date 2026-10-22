@@ -748,6 +748,7 @@
     }
     $('.form-fields', form).hidden = true;
     const cal = form.dataset.calendly;
+    submitted = true;
     if (cal) { openCalendly(cal); return; }
     showDone();
   });
@@ -780,8 +781,10 @@
   modal.addEventListener('click', e => { if (e.target === modal) { closeCal(); afterClose(); } });
   addEventListener('keydown', e => { if (e.key === 'Escape' && !modal.hidden) { closeCal(); afterClose(); } });
   $('[data-cal-reopen]').addEventListener('click', () => showCal());
+  let submitted = false;
   function afterClose() {
-    // Closed without booking: keep the page friendly and let them reopen the calendar.
+    // Closed without booking after filling the form: let them reopen the calendar.
+    if (!submitted) return;
     if ($('[data-form-done]').hidden) showDone('Details received.', 'Pick a time whenever you are ready.');
     $('[data-cal-reopen]').hidden = false;
   }
@@ -793,11 +796,12 @@
       a1: f.company.value.trim(),
       a2: f.volume.value,
       hide_gdpr_banner: '1',
-      hide_event_type_details: '1',
       background_color: 'f6f1e7',
       text_color: '10233f',
       primary_color: '1d5bd8'
     });
+    if (!f.name.value.trim()) q.delete('a2');   // untouched form: nothing to prefill
+    [...q.keys()].forEach(k => { if (!q.get(k)) q.delete(k); });
     calUrl = base + (base.includes('?') ? '&' : '?') + q.toString();
     $('[data-cal-alt]').href = calUrl;
     showCal();
@@ -812,6 +816,13 @@
     sc.onload = mount;
     document.head.appendChild(sc);
   }
+  // Every "Book a demo" button opens the calendar straight away, on this page.
+  $$('a[href="#demo"].btn').forEach(a => a.addEventListener('click', e => {
+    const cal = form.dataset.calendly;
+    if (!cal) return;
+    e.preventDefault();
+    openCalendly(cal);
+  }));
   addEventListener('message', e => {
     if (e.origin !== 'https://calendly.com' || !e.data || e.data.event !== 'calendly.event_scheduled') return;
     closeCal();

@@ -554,9 +554,9 @@ strong.good, .hl-good { color: var(--good); }
 /* Booking modal: Calendly opens over the page, like a popup */
 .cal-modal { position: fixed; inset: 0; z-index: 200; display: flex; align-items: center; justify-content: center; padding: 20px; background: rgba(16,35,63,.5); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); animation: calFade .25s ease; }
 .cal-modal[hidden] { display: none; }
-.cal-card { position: relative; width: min(1000px, 100%); max-height: calc(100svh - 40px); display: flex; flex-direction: column; background: #F6F1E7; border-radius: 22px; box-shadow: 0 40px 120px -30px rgba(16,35,63,.6); padding: 14px 14px 10px; animation: calRise .4s var(--ease); }
+.cal-card { position: relative; width: min(1120px, 100%); max-height: calc(100svh - 40px); display: flex; flex-direction: column; background: #F6F1E7; border-radius: 22px; box-shadow: 0 40px 120px -30px rgba(16,35,63,.6); padding: 14px 14px 10px; animation: calRise .4s var(--ease); }
 .cal-stage { flex: 1; min-height: 0; overflow: auto; border-radius: 14px; background: #F6F1E7; -webkit-overflow-scrolling: touch; }
-.cal-stage .calendly-inline-widget { min-width: 280px; height: min(680px, calc(100svh - 150px)); }
+.cal-stage .calendly-inline-widget { min-width: 280px; height: min(760px, calc(100svh - 120px)); }
 .cal-loading { margin: 0; padding: 60px 20px; text-align: center; color: var(--paper-dim); }
 .cal-close { position: absolute; top: -14px; right: -14px; width: 40px; height: 40px; border-radius: 50%; border: 0; background: #fff; color: var(--paper); font-size: 24px; line-height: 1; cursor: pointer; box-shadow: 0 6px 20px rgba(16,35,63,.25); z-index: 2; }
 .cal-alt { margin: 8px 0 2px; text-align: center; font-size: 13px; }
