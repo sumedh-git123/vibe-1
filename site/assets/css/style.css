@@ -578,3 +578,7 @@ strong.good, .hl-good { color: var(--good); }
 .cal-alt a { color: rgba(255,255,255,.7); }
 .cal-close { background: #fff; color: #111; }
 .cal-blocked .btn { background: #fff; color: #111; }
+
+/* Wordmark: lowercase, tight, compact (River/Vestris style) */
+.brand { font: 700 25px/1 var(--f-display); font-stretch: 100%; letter-spacing: -.045em; gap: 9px; }
+.brand-mark { width: 32px; height: 32px; }
