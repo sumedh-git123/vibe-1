@@ -814,6 +814,14 @@
     sc.src = 'https://assets.calendly.com/assets/external/widget.js';
     sc.async = true;
     sc.onload = mount;
+    // Some hosts (like the preview sandbox) block Calendly's script: say so and offer the booking page.
+    const blocked = () => {
+      if (window.Calendly) return;
+      holder.innerHTML = '<div class="cal-blocked"><p>The calendar can\'t be shown inside this page here.</p><a class="btn" target="_blank" rel="noopener">Choose a time</a></div>';
+      $('a', holder).href = calUrl;
+    };
+    sc.onerror = blocked;
+    setTimeout(blocked, 6000);
     document.head.appendChild(sc);
   }
   // Every "Book a demo" button opens the calendar straight away, on this page.

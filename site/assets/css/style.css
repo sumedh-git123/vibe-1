@@ -565,3 +565,6 @@ strong.good, .hl-good { color: var(--good); }
 @keyframes calFade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes calRise { from { opacity: 0; transform: translateY(18px) scale(.98); } to { opacity: 1; transform: none; } }
 @media (max-width: 640px) { .cal-modal { padding: 10px; } .cal-close { top: 8px; right: 8px; } .cal-card { padding: 8px 8px 6px; } }
+
+.cal-blocked { padding: 70px 20px; text-align: center; }
+.cal-blocked p { margin: 0 0 18px; color: var(--paper-dim); }
